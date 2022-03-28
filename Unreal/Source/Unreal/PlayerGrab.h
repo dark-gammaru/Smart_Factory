@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "PlayerGrab.generated.h"
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREAL_API UPlayerGrab : public UActorComponent
@@ -19,19 +19,23 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	TArray<UPhysicsHandleComponent*> PhysicsHandles;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void Grab(FHitResult, FVector);
+	bool IsGrabbable(FHitResult);
 
 private:
-	class UPlayerInteraction* PlayerInteractionRef;
+	APawn* PlayerCharacterRef;
 
 	int32 CurrentWeight;
+
 	const int32 MaxWeight = 5;
 
 	const float GrabDistance = 50.f;
-	
+
+	int32 HoldingObjects = 0;
+
+	UPROPERTY(EditAnywhere);
+	TArray<USceneComponent *> HoldPositions;
+
 };

@@ -1,16 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
+
+#include "HoldableObject.h"
 #include "PlayerInteraction.h"
 #include "PlayerGrab.h"
 
-// Sets default values for this component's properties
 UPlayerGrab::UPlayerGrab()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -19,45 +17,37 @@ void UPlayerGrab::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetOwner()->GetComponents<UPhysicsHandleComponent>(PhysicsHandles);
+	USceneComponent* CubeHolder = Cast<USceneComponent>(GetOwner()->GetDefaultSubobjectByName(TEXT("PositionHolder")));
+	CubeHolder->GetChildrenComponents(true, HoldPositions);
 
-	UInputComponent* InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-
-	if (InputComponent == nullptr) {
-		UE_LOG(LogTemp, Error, TEXT("No InputComponent %s"), *GetOwner()->GetName());
-	}
-	else {
-//		InputComponent->BindAction("Grab", IE_Pressed, this, &UPlayerGrab::Grab);
-	}
-
-	PlayerInteractionRef = GetOwner()->FindComponentByClass<UPlayerInteraction>();
+	// Get Player Reference for Grab function
+	PlayerCharacterRef = GetWorld()->GetFirstPlayerController()->GetPawn();
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *PlayerCharacterRef->GetName());
 }
 
-
-// Called every frame
-void UPlayerGrab::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (PhysicsHandles[0]->GrabbedComponent) {
-		PhysicsHandles[0]->SetTargetLocation(PlayerInteractionRef->GetPlayersReach(GrabDistance));
-	}
-	// ...
-}
 
 void UPlayerGrab::Grab(FHitResult Hit, FVector PlayerReach) {
-	UPrimitiveComponent* ComponentToGrab = Hit.GetComponent();
+	if (HoldingObjects >= HoldPositions.Num()) {
+		UE_LOG(LogTemp, Error, TEXT("Grab Error : HoldingObjects >= Hold Max size"));
+		return;
+	}
 
-	if (Hit.GetActor()) {
-		PhysicsHandles[0]->GrabComponentAtLocation(
-			ComponentToGrab,
-			NAME_None,
-			PlayerReach
-		);
-		UE_LOG(LogTemp, Warning, TEXT("GRABBED"));
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("NULL"));
-	}
+	int32 ObjectWeight = Hit.GetActor()->FindComponentByClass<UHoldableObject>()->GetWeight();
+	CurrentWeight += ObjectWeight;
+
+	AActor* ComponentToGrab = Hit.GetActor();
+
+	ComponentToGrab->DisableComponentsSimulatePhysics();
+
+	ComponentToGrab->AttachToActor(PlayerCharacterRef, FAttachmentTransformRules::KeepRelativeTransform);
+	ComponentToGrab->SetActorRelativeLocation(HoldPositions[HoldingObjects]->GetRelativeLocation());
+	ComponentToGrab->SetActorRelativeRotation(FQuat::Identity);
+
+	++HoldingObjects;
+}
+
+bool UPlayerGrab::IsGrabbable(FHitResult Hit) {
+	int32 ObjectWeight = Hit.GetActor()->FindComponentByClass<UHoldableObject>()->GetWeight();
+	return MaxWeight >= CurrentWeight + ObjectWeight;
 }
 

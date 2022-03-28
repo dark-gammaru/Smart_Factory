@@ -30,6 +30,7 @@ private:
 	FVector GetPlayersWorldPos() const;
 
 	void Interact(void);
+	void IsInteractable(void);
 
 	bool bIsInteractable = false;
 	const float HandDistance = 150.f;

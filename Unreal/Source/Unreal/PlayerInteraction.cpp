@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerGrab.h"
+#include "HoldableObject.h"
 #include "PlayerInteraction.h"
 
 // Sets default values for this component's properties
@@ -31,14 +32,34 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	IsInteractable();
+}
+
+void UPlayerInteraction::IsInteractable(void) {
+	FHitResult Hit = GetFirstPhysicsBodyInReach();
+	if (Hit.GetActor()) {
+		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
+			if (PlayerGrabRef->IsGrabbable(Hit)) {
+				UE_LOG(LogTemp, Warning, TEXT("YOU CAN GRAB IT"));
+			}
+			else{
+				UE_LOG(LogTemp, Warning, TEXT("YOU CANNOT GRAB IT"));
+			}
+		}
+	}
 }
 
 void UPlayerInteraction::Interact(void) {
-	UE_LOG(LogTemp, Warning, TEXT("INTERACT"));
-	FHitResult TempHit = GetFirstPhysicsBodyInReach();
-	if (TempHit.GetActor()) {
-		PlayerGrabRef->Grab(TempHit, GetPlayersReach(HandDistance));
+	UE_LOG(LogTemp, Warning, TEXT("TRY INTERACT"));
+	FHitResult Hit = GetFirstPhysicsBodyInReach();
+	if (Hit.GetActor()){
+		// If you can grab it, hold it.
+		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
+			if (PlayerGrabRef->IsGrabbable(Hit)) {
+				UE_LOG(LogTemp, Warning, TEXT("GRAB"));
+				PlayerGrabRef->Grab(Hit, GetPlayersReach(HandDistance));
+			}
+		}
 	}
 }
 
