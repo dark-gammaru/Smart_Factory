@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "PlayerInteraction.h"
 #include "PlayerGrab.h"
 #include "HoldableObject.h"
-#include "PlayerInteraction.h"
 
 // Sets default values for this component's properties
 UPlayerInteraction::UPlayerInteraction()
