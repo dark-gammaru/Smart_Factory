@@ -22,11 +22,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	FVector GetPlayersReach(float Distance) const;
 
 private:
 	class UPlayerGrab* PlayerGrabRef;
 	FHitResult GetFirstPhysicsBodyInReach() const;
+	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
 
 	void Interact(void);

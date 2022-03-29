@@ -1,21 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerInteraction.h"
 #include "PlayerGrab.h"
 #include "HoldableObject.h"
 
-// Sets default values for this component's properties
 UPlayerInteraction::UPlayerInteraction()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UPlayerInteraction::BeginPlay()
 {
 	Super::BeginPlay();
@@ -26,8 +18,6 @@ void UPlayerInteraction::BeginPlay()
 	PlayerGrabRef = GetOwner()->FindComponentByClass<UPlayerGrab>();
 }
 
-
-// Called every frame
 void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -35,6 +25,7 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	IsInteractable();
 }
 
+// Check if an object is interactable and change GUI [LSH]
 void UPlayerInteraction::IsInteractable(void) {
 	FHitResult Hit = GetFirstPhysicsBodyInReach();
 	if (Hit.GetActor()) {
@@ -49,6 +40,7 @@ void UPlayerInteraction::IsInteractable(void) {
 	}
 }
 
+// Interact with objects [LSH]
 void UPlayerInteraction::Interact(void) {
 	UE_LOG(LogTemp, Warning, TEXT("TRY INTERACT"));
 	FHitResult Hit = GetFirstPhysicsBodyInReach();
@@ -57,12 +49,52 @@ void UPlayerInteraction::Interact(void) {
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
 			if (PlayerGrabRef->IsGrabbable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("GRAB"));
-				PlayerGrabRef->Grab(Hit, GetPlayersReach(HandDistance));
+				PlayerGrabRef->Grab(Hit);
 			}
 		}
 	}
 }
 
+/// <summary>
+/// Get player camera position and return it. [LSH]
+/// </summary>
+/// <returns>FVector of player camera position</returns>
+FVector UPlayerInteraction::GetPlayersWorldPos() const {
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	// Get player's camera position and rotation
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+
+	// Return player camera's location
+	return PlayerViewPointLocation;
+}
+
+/// <summary>
+/// Calculate raycast end point vector with player viewpoint and float HandDistance [LSH]
+/// </summary>
+/// <returns>FVector of player camera position to raycast end point</returns>
+FVector UPlayerInteraction::GetPlayersReach() const {
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	// Get player camera's position and rotation
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+
+	// Make vector from Rotation, Location, Distance
+	return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * HandDistance;
+}
+
+/// <summary>
+/// Raycast with FVector from GetPlayersWorldPos() and GetPlayersReach() [LSH]
+/// </summary>
+/// <returns>Raycast result FHitResult</returns>
 FHitResult UPlayerInteraction::GetFirstPhysicsBodyInReach() const {
 	FHitResult Hit;
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
@@ -70,34 +102,9 @@ FHitResult UPlayerInteraction::GetFirstPhysicsBodyInReach() const {
 	GetWorld()->LineTraceSingleByObjectType(
 		OUT Hit,
 		GetPlayersWorldPos(),
-		GetPlayersReach(HandDistance),
+		GetPlayersReach(),
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		TraceParams
 	);
 	return Hit;
-}
-
-
-FVector UPlayerInteraction::GetPlayersReach(float Distance) const {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
-	);
-
-	return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Distance;
-}
-
-FVector UPlayerInteraction::GetPlayersWorldPos() const {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
-	);
-
-	return PlayerViewPointLocation;
 }

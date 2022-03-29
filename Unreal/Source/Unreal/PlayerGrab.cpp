@@ -2,17 +2,13 @@
 
 #include "PlayerGrab.h"
 #include "HoldableObject.h"
-#include "PlayerInteraction.h"
 
 UPlayerGrab::UPlayerGrab()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
 
-// Called when the game starts
 void UPlayerGrab::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,8 +21,12 @@ void UPlayerGrab::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *PlayerCharacterRef->GetName());
 }
 
-
-void UPlayerGrab::Grab(FHitResult Hit, FVector PlayerReach) {
+/// <summary>
+/// Grab a target object, set position and rotation to hand. [LSH]
+/// </summary>
+/// <param name="Hit"> : Raycast result, Get target object's information from it. </param>
+void UPlayerGrab::Grab(FHitResult Hit) {
+	// Prevent error
 	if (HoldingObjects >= HoldPositions.Num()) {
 		UE_LOG(LogTemp, Error, TEXT("Grab Error : HoldingObjects >= Hold Max size"));
 		return;
@@ -37,8 +37,10 @@ void UPlayerGrab::Grab(FHitResult Hit, FVector PlayerReach) {
 
 	AActor* ComponentToGrab = Hit.GetActor();
 
+	// Disable physics to move object
 	ComponentToGrab->DisableComponentsSimulatePhysics();
 
+	// Attatch to character's hold position, set location and rotation
 	ComponentToGrab->AttachToActor(PlayerCharacterRef, FAttachmentTransformRules::KeepRelativeTransform);
 	ComponentToGrab->SetActorRelativeLocation(HoldPositions[HoldingObjects]->GetRelativeLocation());
 	ComponentToGrab->SetActorRelativeRotation(FQuat::Identity);
@@ -46,6 +48,11 @@ void UPlayerGrab::Grab(FHitResult Hit, FVector PlayerReach) {
 	++HoldingObjects;
 }
 
+/// <summary>
+/// Check if player could grab target object. [LSH]
+/// </summary>
+/// <param name="Hit"> : Raycast result, Get target object's weight from it. </param>
+/// <returns>True if player can grab object.</returns>
 bool UPlayerGrab::IsGrabbable(FHitResult Hit) {
 	int32 ObjectWeight = Hit.GetActor()->FindComponentByClass<UHoldableObject>()->GetWeight();
 	return MaxWeight >= CurrentWeight + ObjectWeight;

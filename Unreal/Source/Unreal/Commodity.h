@@ -14,4 +14,13 @@ class UNREAL_API UCommodity : public UHoldableObject
 {
 	GENERATED_BODY()
 	
+private:
+	UPROPERTY(EditAnywhere)
+	FString ScientificName;
+
+	UPROPERTY(EditAnywhere)
+	FString Information;
+
+	UPROPERTY(EditAnywhere)
+	int32 GrowthTime;
 };

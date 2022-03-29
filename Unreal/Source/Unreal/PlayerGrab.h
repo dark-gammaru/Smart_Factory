@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void Grab(FHitResult, FVector);
+	void Grab(FHitResult);
 	bool IsGrabbable(FHitResult);
 
 private:
@@ -30,8 +30,6 @@ private:
 	int32 CurrentWeight;
 
 	const int32 MaxWeight = 5;
-
-	const float GrabDistance = 50.f;
 
 	int32 HoldingObjects = 0;
 
