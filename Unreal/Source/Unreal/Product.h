@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "HoldableObject.h"
+#include "HoldableObjectEnum.h"
 #include "Product.generated.h"
 
 /**
@@ -17,4 +18,10 @@ class UNREAL_API UProduct : public UHoldableObject
 private:
 	UPROPERTY(EditAnywhere)
 	bool bIsBadQuality;
+
+	UPROPERTY(EditAnywhere)
+	EProductCategory ProductCategory;
+
+	UPROPERTY(EditAnywhere)
+	EProductColor ProductColor;
 };
