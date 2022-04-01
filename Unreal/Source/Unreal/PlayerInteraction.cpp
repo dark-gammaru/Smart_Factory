@@ -1,6 +1,6 @@
 
 #include "PlayerInteraction.h"
-#include "PlayerGrab.h"
+#include "PlayerPick.h"
 #include "HoldableObject.h"
 
 UPlayerInteraction::UPlayerInteraction()
@@ -15,7 +15,7 @@ void UPlayerInteraction::BeginPlay()
 	UInputComponent* InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	InputComponent->BindAction(TEXT("Click"), IE_Pressed, this, &UPlayerInteraction::Interact);
 
-	PlayerGrabRef = GetOwner()->FindComponentByClass<UPlayerGrab>();
+	PlayerPickRef = GetOwner()->FindComponentByClass<UPlayerPick>();
 }
 
 void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -31,7 +31,7 @@ void UPlayerInteraction::IsInteractable(void) {
 	if (Hit.GetActor()) {
 		bIsHit = true;
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
-			if (PlayerGrabRef->IsGrabbable(Hit)) {
+			if (PlayerPickRef->IsPickbable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("YOU CAN GRAB IT"));
 				bIsInteractable = true;
 			}
@@ -54,10 +54,10 @@ void UPlayerInteraction::Interact(void) {
 		bIsHit = true;
 		// If you can grab it, hold it.
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
-			if (PlayerGrabRef->IsGrabbable(Hit)) {
+			if (PlayerPickRef->IsPickbable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("GRAB"));
 				bIsInteractable = true;
-				PlayerGrabRef->Grab(Hit);
+				PlayerPickRef->Pick(Hit);
 			}
 			else {
 				bIsInteractable = false;

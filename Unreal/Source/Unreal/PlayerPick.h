@@ -4,25 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PlayerGrab.generated.h"
+#include "PlayerPick.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UNREAL_API UPlayerGrab : public UActorComponent
+class UNREAL_API UPlayerPick : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UPlayerGrab();
+	UPlayerPick();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	void Grab(FHitResult);
-	bool IsGrabbable(FHitResult);
+	void Pick(FHitResult);
+	bool IsPickbable(FHitResult);
 
 private:
 	APawn* PlayerCharacterRef;
@@ -33,7 +33,6 @@ private:
 
 	int32 HoldingObjects = 0;
 
-	UPROPERTY(EditAnywhere);
 	TArray<USceneComponent *> HoldPositions;
 
 };

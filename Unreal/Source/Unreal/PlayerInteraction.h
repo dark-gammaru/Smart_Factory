@@ -28,7 +28,7 @@ public:
 	bool bIsInteractable = false;
 
 private:
-	class UPlayerGrab* PlayerGrabRef;
+	class UPlayerPick* PlayerPickRef;
 	FHitResult GetFirstPhysicsBodyInReach() const;
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
