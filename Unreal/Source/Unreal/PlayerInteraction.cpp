@@ -29,14 +29,20 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 void UPlayerInteraction::IsInteractable(void) {
 	FHitResult Hit = GetFirstPhysicsBodyInReach();
 	if (Hit.GetActor()) {
+		bIsHit = true;
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
 			if (PlayerGrabRef->IsGrabbable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("YOU CAN GRAB IT"));
+				bIsInteractable = true;
 			}
 			else{
 				UE_LOG(LogTemp, Warning, TEXT("YOU CANNOT GRAB IT"));
+				bIsInteractable = false;
 			}
 		}
+	}
+	else {
+		bIsHit = false;
 	}
 }
 
@@ -45,13 +51,24 @@ void UPlayerInteraction::Interact(void) {
 	UE_LOG(LogTemp, Warning, TEXT("TRY INTERACT"));
 	FHitResult Hit = GetFirstPhysicsBodyInReach();
 	if (Hit.GetActor()){
+		bIsHit = true;
 		// If you can grab it, hold it.
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
 			if (PlayerGrabRef->IsGrabbable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("GRAB"));
+				bIsInteractable = true;
 				PlayerGrabRef->Grab(Hit);
 			}
+			else {
+				bIsInteractable = false;
+			}
 		}
+		else{
+			bIsInteractable = false;
+		}
+	}
+	else{
+		bIsHit = false;
 	}
 }
 

@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PlayerInteraction.generated.h"
+#include "Incubator.generated.h"
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UNREAL_API UPlayerInteraction : public UActorComponent
+class UNREAL_API UIncubator : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UPlayerInteraction();
+	UIncubator();
 
 protected:
 	// Called when the game starts
@@ -22,19 +23,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	UPROPERTY(BlueprintReadWrite);
-	bool bIsHit = false;
-	UPROPERTY(BlueprintReadWrite);
-	bool bIsInteractable = false;
 
-private:
-	class UPlayerGrab* PlayerGrabRef;
-	FHitResult GetFirstPhysicsBodyInReach() const;
-	FVector GetPlayersReach() const;
-	FVector GetPlayersWorldPos() const;
-
-	void Interact(void);
-	void IsInteractable(void);
-
-	const float HandDistance = 150.f;
+		
 };
