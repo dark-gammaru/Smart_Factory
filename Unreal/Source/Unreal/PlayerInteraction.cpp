@@ -44,7 +44,9 @@ void UPlayerInteraction::IsInteractable(void) {
 		else if (Hit.GetActor()->FindComponentByClass<UIncubator>()) {
 			auto IncubatorRef = Hit.GetActor()->FindComponentByClass<UIncubator>();
 			// If you have appropreate commodity, hold it with right hand
-			if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+			if (IncubatorRef->IsEmpty()) {
+				if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+				}
 			}
 			// Player can always interact with incubator.
 			bIsInteractable = true;
@@ -81,7 +83,13 @@ void UPlayerInteraction::Interact(void) {
 			// Player can always interact with incubator.
 			bIsInteractable = true;
 			// If you have appropreate commodity, start growing commodity immediately.
-			if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+			if (IncubatorRef->IsEmpty()) {
+				if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+					IncubatorRef->PutCommodity(PlayerPickRef->GetRightHandObjectRef());
+				}
+				else {
+					IncubatorRef->OpenUI();
+				}
 			}
 			// If not, open incubator UI.
 			else {

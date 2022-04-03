@@ -30,6 +30,8 @@ public:
 	// Used for Incubater check
 	bool IsInteractable(bool, EHabitat);
 
+	AActor* GetRightHandObjectRef();
+
 
 private:
 	APawn* PlayerCharacterRef;

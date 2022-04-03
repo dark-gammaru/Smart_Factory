@@ -187,3 +187,21 @@ void UPlayerPick::ResetAllObjectPositions() {
 		}
 	}
 }
+
+AActor* UPlayerPick::GetRightHandObjectRef() {
+	auto ReturnRef = RightHandObject;
+	
+	for (int i = 0; i < HoldingObjectArray.Num(); ++i) {
+		try {
+			if (HoldingObjectArray[i] == ReturnRef) {
+				UE_LOG(LogTemp, Warning, TEXT("Ref Successed"));
+				HoldingObjectArray[i] = nullptr;
+				break;
+			}
+		}
+		catch (...) {}
+	}
+	
+	RightHandObject = nullptr;
+	return ReturnRef;
+}

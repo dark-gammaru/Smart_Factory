@@ -25,10 +25,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	bool Is(FHitResult);
+	void PutCommodity(AActor*);
 	
 	bool IsAnimal();
 	EHabitat GetHabitat();
+
+	bool IsEmpty();
 
 	void OpenUI();
 
@@ -36,8 +38,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	EHabitat IncubatorHabitat;
 
-	class UCommodity* CommodityRef;
+	UCommodity* GrowingCommodityRef;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsAnimal;
+
+	FDateTime CompleteDateTime;
 };
