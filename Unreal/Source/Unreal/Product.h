@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UNREAL_API UProduct : public UHoldableObject
 {
 	GENERATED_BODY()

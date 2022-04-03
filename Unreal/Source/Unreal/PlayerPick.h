@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HoldableObjectEnum.h"
 #include "PlayerPick.generated.h"
 
 
@@ -20,9 +21,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	void Pick(FHitResult);
-	bool IsPickbable(FHitResult);
+	bool IsPickable(FHitResult);
+
+	// Used for Incubater check
+	bool IsInteractable(bool, EHabitat);
+
 
 private:
 	APawn* PlayerCharacterRef;
@@ -31,8 +38,30 @@ private:
 
 	const int32 MaxWeight = 5;
 
-	int32 HoldingObjects = 0;
+	int32 HoldingObjectCount = 0;
 
 	TArray<USceneComponent *> HoldPositions;
+
+	TArray<AActor*> HoldingObjectArray;
+
+	AActor* RightHandObject;
+
+	void HoldRightHand();
+
+#pragma region Swap
+public:
+	void ResetSwapValues();
+
+private:
+	void Swap(float MouseAxis);
+
+	bool bIsSwappable;
+	bool bSwapIsAnimal;
+	EHabitat SwapHabitat;
+	int32 SwapIndex;
+
+	void ResetAllObjectPositions();
+
+#pragma endregion
 
 };

@@ -2,6 +2,7 @@
 #include "PlayerInteraction.h"
 #include "PlayerPick.h"
 #include "HoldableObject.h"
+#include "Incubator.h"
 
 UPlayerInteraction::UPlayerInteraction()
 {
@@ -31,7 +32,7 @@ void UPlayerInteraction::IsInteractable(void) {
 	if (Hit.GetActor()) {
 		bIsHit = true;
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
-			if (PlayerPickRef->IsPickbable(Hit)) {
+			if (PlayerPickRef->IsPickable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("YOU CAN GRAB IT"));
 				bIsInteractable = true;
 			}
@@ -40,9 +41,21 @@ void UPlayerInteraction::IsInteractable(void) {
 				bIsInteractable = false;
 			}
 		}
+		else if (Hit.GetActor()->FindComponentByClass<UIncubator>()) {
+			auto IncubatorRef = Hit.GetActor()->FindComponentByClass<UIncubator>();
+			// If you have appropreate commodity, hold it with right hand
+			if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+			}
+			// Player can always interact with incubator.
+			bIsInteractable = true;
+		}
+		else {
+			bIsInteractable = false;
+		}
 	}
 	else {
 		bIsHit = false;
+		PlayerPickRef->ResetSwapValues();
 	}
 }
 
@@ -54,13 +67,25 @@ void UPlayerInteraction::Interact(void) {
 		bIsHit = true;
 		// If you can grab it, hold it.
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
-			if (PlayerPickRef->IsPickbable(Hit)) {
+			if (PlayerPickRef->IsPickable(Hit)) {
 				UE_LOG(LogTemp, Warning, TEXT("GRAB"));
 				bIsInteractable = true;
 				PlayerPickRef->Pick(Hit);
 			}
 			else {
 				bIsInteractable = false;
+			}
+		}
+		else if (Hit.GetActor()->FindComponentByClass<UIncubator>()) {
+			auto IncubatorRef = Hit.GetActor()->FindComponentByClass<UIncubator>();
+			// Player can always interact with incubator.
+			bIsInteractable = true;
+			// If you have appropreate commodity, start growing commodity immediately.
+			if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
+			}
+			// If not, open incubator UI.
+			else {
+				IncubatorRef->OpenUI();
 			}
 		}
 		else{

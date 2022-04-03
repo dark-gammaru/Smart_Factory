@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Commodity.h"
 #include "Components/ActorComponent.h"
+#include "HoldableObjectEnum.h"
 #include "Incubator.generated.h"
 
 
@@ -24,6 +26,18 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	bool Is(FHitResult);
+	
+	bool IsAnimal();
+	EHabitat GetHabitat();
 
-		
+	void OpenUI();
+
+private:
+	UPROPERTY(EditAnywhere)
+	EHabitat IncubatorHabitat;
+
+	class UCommodity* CommodityRef;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsAnimal;
 };

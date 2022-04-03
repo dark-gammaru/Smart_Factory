@@ -13,7 +13,6 @@ UIncubator::UIncubator()
 	// ...
 }
 
-
 // Called when the game starts
 void UIncubator::BeginPlay()
 {
@@ -23,7 +22,6 @@ void UIncubator::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UIncubator::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -31,4 +29,22 @@ void UIncubator::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 	// ...
 }
+
+/// <summary>
+/// Test Function to check PlayerInteraction is working properly. [LSH]
+/// </summary>
+/// <param name=""></param>
+void UIncubator::OpenUI(void) {
+	UE_LOG(LogTemp, Warning, TEXT("Open Incubator Successed"));
+}
+
+bool UIncubator::IsAnimal() {
+	return bIsAnimal;
+}
+
+
+EHabitat UIncubator::GetHabitat() {
+	return IncubatorHabitat;
+}
+
 

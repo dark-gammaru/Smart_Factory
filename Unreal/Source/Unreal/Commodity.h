@@ -5,12 +5,12 @@
 #include "HoldableObjectEnum.h"
 #include "Commodity.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UNREAL_API UCommodity : public UHoldableObject
 {
 	GENERATED_BODY()
 	
-private:
+public:
 	UPROPERTY(EditAnywhere)
 	FString ScientificName;
 
@@ -31,5 +31,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	EProductColor ProductColor;
-
 };
