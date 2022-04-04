@@ -124,14 +124,16 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 	}
 	for (int i = 0; i < HoldingObjectArray.Num(); ++i) {
 		try {
-			if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
-				&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->Habitat == IncubatorHabitat) {
-				bIsSwappable = true;
-				bSwapIsAnimal = bIsAnimal;
-				SwapHabitat = IncubatorHabitat;
-				SwapIndex = i;
-				RightHandObject = HoldingObjectArray[i];
-				return true;
+			if (HoldingObjectArray[i]) {
+				if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
+					&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->Habitat == IncubatorHabitat) {
+					bIsSwappable = true;
+					bSwapIsAnimal = bIsAnimal;
+					SwapHabitat = IncubatorHabitat;
+					SwapIndex = i;
+					RightHandObject = HoldingObjectArray[i];
+					return true;
+				}
 			}
 		}
 		catch (...) {}
