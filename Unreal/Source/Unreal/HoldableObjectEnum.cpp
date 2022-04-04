@@ -2,11 +2,3 @@
 
 
 #include "HoldableObjectEnum.h"
-
-HoldableObjectEnum::HoldableObjectEnum()
-{
-}
-
-HoldableObjectEnum::~HoldableObjectEnum()
-{
-}

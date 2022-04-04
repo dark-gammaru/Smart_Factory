@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -23,8 +22,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void PutCommodity(AActor*);
 	
 	bool IsAnimal();
@@ -39,9 +36,15 @@ private:
 	EHabitat IncubatorHabitat;
 
 	UCommodity* GrowingCommodityRef;
+	float CommodityGrowthDuration;
+
+	FDateTime StartGrowingTime;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsAnimal;
 
-	FDateTime CompleteDateTime;
+	UFUNCTION(BlueprintCallable)
+	void CheckTime(FDateTime CurrentTime);
+
+	float CalculateProgress(FDateTime CurrentTime);
 };

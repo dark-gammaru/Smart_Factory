@@ -9,9 +9,6 @@
  */
 class UNREAL_API HoldableObjectEnum
 {
-public:
-	HoldableObjectEnum();
-	~HoldableObjectEnum();
 };
 
 UENUM(BlueprintType)

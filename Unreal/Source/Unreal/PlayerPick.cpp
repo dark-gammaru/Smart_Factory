@@ -69,21 +69,21 @@ void UPlayerPick::Pick(FHitResult Hit) {
 void UPlayerPick::Swap(float MouseAxis) {
 	if (MouseAxis > 0.9f || MouseAxis < -0.9f) {
 		if (bIsSwappable) {
-			int index;
+			int32 index;
 			if (MouseAxis > 0.9f) {
-				index = (SwapIndex + 1) % HoldPositions.Num();
+				index = (SelectedIndex + 1) % HoldPositions.Num();
 			}
 			else {
-				index = (SwapIndex + HoldPositions.Num() - 1) % HoldPositions.Num();
+				index = (SelectedIndex + HoldPositions.Num() - 1) % HoldPositions.Num();
 			}
-			for (int i = 0; i < HoldingObjectArray.Num(); i++) {
+			for (int32 i = 0; i < HoldingObjectArray.Num(); i++) {
 				try {
 					if (HoldingObjectArray[index]) {
 						if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->bIsAnimal == bSwapIsAnimal
 							&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->Habitat == SwapHabitat) {
-							SwapIndex = index;
+							SelectedIndex = index;
 							RightHandObject = HoldingObjectArray[index];
-							ResetAllObjectPositions();
+							ReorderObjects();
 							UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
 							return;
 						}
@@ -122,7 +122,7 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 	if (bIsSwappable) {
 		return true;
 	}
-	for (int i = 0; i < HoldingObjectArray.Num(); ++i) {
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
 		try {
 			if (HoldingObjectArray[i]) {
 				if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
@@ -130,7 +130,7 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 					bIsSwappable = true;
 					bSwapIsAnimal = bIsAnimal;
 					SwapHabitat = IncubatorHabitat;
-					SwapIndex = i;
+					SelectedIndex = i;
 					RightHandObject = HoldingObjectArray[i];
 					return true;
 				}
@@ -172,17 +172,25 @@ void UPlayerPick::HoldRightHand() {
 void UPlayerPick::ResetSwapValues() {
 	if (bIsSwappable) {
 		bIsSwappable = false;
-		ResetAllObjectPositions();
+		ReorderObjects();
 	}
 	RightHandObject = nullptr;
 }
 
 /// <summary>
-/// Set all object position to its correct position. 
+/// Reorder HoldingObjectArray and set all object position to its correct position. 
 /// Used to undo right hand object position. [LSH]
 /// </summary>
-void UPlayerPick::ResetAllObjectPositions() {
-	for (int i = 0; i < HoldingObjectArray.Num(); ++i) {
+void UPlayerPick::ReorderObjects() {
+	for (int32 i = 0; i < HoldingObjectArray.Num() - 1; ++i) {
+		if (HoldingObjectArray[i] == nullptr) {
+			HoldingObjectArray[i] = HoldingObjectArray[i + 1];
+			HoldingObjectArray[i + 1] = nullptr;
+		}
+	}
+
+	// Change object position after moving pointer.
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
 		if (HoldingObjectArray[i] != nullptr) {
 			HoldingObjectArray[i]->SetActorRelativeLocation(HoldPositions[i]->GetRelativeLocation());
 			HoldingObjectArray[i]->SetActorRelativeRotation(FQuat::Identity);
@@ -190,20 +198,32 @@ void UPlayerPick::ResetAllObjectPositions() {
 	}
 }
 
-AActor* UPlayerPick::GetRightHandObjectRef() {
-	auto ReturnRef = RightHandObject;
-	
-	for (int i = 0; i < HoldingObjectArray.Num(); ++i) {
+/// <summary>
+/// Use right hand object and return reference of it. [LSH]
+/// </summary>
+/// <returns>Reference of right hand object.</returns>
+AActor* UPlayerPick::UseRightHandObject() {
+	bIsSwappable = false;
+
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
 		try {
-			if (HoldingObjectArray[i] == ReturnRef) {
-				UE_LOG(LogTemp, Warning, TEXT("Ref Successed"));
+			if (HoldingObjectArray[i] == RightHandObject) {
 				HoldingObjectArray[i] = nullptr;
+				UE_LOG(LogTemp, Warning, TEXT("Deleted"));
 				break;
 			}
 		}
 		catch (...) {}
 	}
-	
+
+	if (RightHandObject->FindComponentByClass<UHoldableObject>()) {
+		CurrentWeight -= RightHandObject->FindComponentByClass<UHoldableObject>()->GetWeight();
+	}
+
+	ReorderObjects();
+
+	auto ReturnRef = RightHandObject;
 	RightHandObject = nullptr;
+	--HoldingObjectCount;
 	return ReturnRef;
 }

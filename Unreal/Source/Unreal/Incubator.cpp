@@ -1,16 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SmartFactoryLevelActor.h"
+#include "SmartFactoryGameInstance.h"
 #include "Incubator.h"
 
 // Sets default values for this component's properties
 UIncubator::UIncubator()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 // Called when the game starts
@@ -18,16 +14,8 @@ void UIncubator::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
-}
-
-// Called every frame
-void UIncubator::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	//Register CheckTime to CheckTimeDelegate
+	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->CheckTimeDelegate.AddDynamic(this, &UIncubator::CheckTime);
 }
 
 /// <summary>
@@ -39,7 +27,7 @@ void UIncubator::OpenUI(void) {
 }
 
 /// <summary>
-/// Start Growing Commodity
+/// Start growing commodity. Set parent, position of commodity and save growing time. [LSH]
 /// </summary>
 /// <param name="CommodityRef"> : Reference of Commodity</param>
 void UIncubator::PutCommodity(AActor* CommodityRef) {
@@ -49,9 +37,12 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 		CommodityRef->SetActorRelativeLocation(FVector(0.f, 0.f, 160.f));
 	}
 	else {
-		CommodityRef->SetActorRelativeLocation(FVector(0.f, 0.f, 130.f));
+		CommodityRef->SetActorRelativeLocation(FVector(0.f, 0.f, 200.f));
 	}
 	CommodityRef->SetActorRelativeRotation(FQuat::Identity);
+	
+	CommodityGrowthDuration = (float)(GrowingCommodityRef->GrowthTime);
+	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
 }
 
 
@@ -69,6 +60,30 @@ EHabitat UIncubator::GetHabitat() {
 /// <returns>True if incubator is empty.</returns>
 bool UIncubator::IsEmpty() {
 	return GrowingCommodityRef == nullptr;
+}
+
+/// <summary>
+/// Check time and change progress. Registered to CheckTimeDelegate, called every 5 seconds. [LSH]
+/// </summary>
+/// <param name="CurrentTime"> : Current time from GameInstance.</param>
+void UIncubator::CheckTime(FDateTime CurrentTime) {
+	if (GrowingCommodityRef) {
+		CalculateProgress(CurrentTime);
+		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), CalculateProgress(CurrentTime));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Empty Incubator %s : Working"), *GetOwner()->GetName());
+	}
+}
+
+/// <summary>
+/// Calculate growing progress as percentage. [LSH]
+/// </summary>
+/// <param name="CurrentTime"> : Current Time from GameInstance.</param>
+/// <returns>Float percentage of growing progress.</returns>
+float UIncubator::CalculateProgress(FDateTime CurrentTime) {
+	FTimespan Timespan = CurrentTime - StartGrowingTime;
+	return (Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration * 100;
 }
 
 

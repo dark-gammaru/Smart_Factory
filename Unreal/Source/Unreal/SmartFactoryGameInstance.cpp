@@ -2,3 +2,7 @@
 
 
 #include "SmartFactoryGameInstance.h"
+
+FDateTime USmartFactoryGameInstance::GetGameTime(void) {
+	return GameTime;
+}

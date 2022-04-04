@@ -33,11 +33,9 @@ void UPlayerInteraction::IsInteractable(void) {
 		bIsHit = true;
 		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
 			if (PlayerPickRef->IsPickable(Hit)) {
-				UE_LOG(LogTemp, Warning, TEXT("YOU CAN GRAB IT"));
 				bIsInteractable = true;
 			}
 			else{
-				UE_LOG(LogTemp, Warning, TEXT("YOU CANNOT GRAB IT"));
 				bIsInteractable = false;
 			}
 		}
@@ -63,7 +61,6 @@ void UPlayerInteraction::IsInteractable(void) {
 
 // Interact with objects [LSH]
 void UPlayerInteraction::Interact(void) {
-	UE_LOG(LogTemp, Warning, TEXT("TRY INTERACT"));
 	FHitResult Hit = GetFirstPhysicsBodyInReach();
 	if (Hit.GetActor()){
 		bIsHit = true;
@@ -85,10 +82,12 @@ void UPlayerInteraction::Interact(void) {
 			// If you have appropreate commodity, start growing commodity immediately.
 			if (IncubatorRef->IsEmpty()) {
 				if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
-					IncubatorRef->PutCommodity(PlayerPickRef->GetRightHandObjectRef());
+					IncubatorRef->PutCommodity(PlayerPickRef->UseRightHandObject());
+					UE_LOG(LogTemp, Warning, TEXT("Put Commodity"));
 				}
 				else {
 					IncubatorRef->OpenUI();
+					UE_LOG(LogTemp, Warning, TEXT("Open UI"));
 				}
 			}
 			// If not, open incubator UI.

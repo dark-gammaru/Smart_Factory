@@ -30,7 +30,7 @@ public:
 	// Used for Incubater check
 	bool IsInteractable(bool, EHabitat);
 
-	AActor* GetRightHandObjectRef();
+	AActor* UseRightHandObject();
 
 
 private:
@@ -60,9 +60,9 @@ private:
 	bool bIsSwappable;
 	bool bSwapIsAnimal;
 	EHabitat SwapHabitat;
-	int32 SwapIndex;
+	int32 SelectedIndex;
 
-	void ResetAllObjectPositions();
+	void ReorderObjects();
 
 #pragma endregion
 
