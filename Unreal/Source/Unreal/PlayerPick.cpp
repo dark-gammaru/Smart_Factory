@@ -77,19 +77,16 @@ void UPlayerPick::Swap(float MouseAxis) {
 				index = (SelectedIndex + HoldPositions.Num() - 1) % HoldPositions.Num();
 			}
 			for (int32 i = 0; i < HoldingObjectArray.Num(); i++) {
-				try {
-					if (HoldingObjectArray[index]) {
-						if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->bIsAnimal == bSwapIsAnimal
-							&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->Habitat == SwapHabitat) {
-							SelectedIndex = index;
-							RightHandObject = HoldingObjectArray[index];
-							ReorderObjects();
-							UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
-							return;
-						}
+				if (HoldingObjectArray[index]) {
+					if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->bIsAnimal == bSwapIsAnimal
+						&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->Habitat == SwapHabitat) {
+						SelectedIndex = index;
+						RightHandObject = HoldingObjectArray[index];
+						ReorderObjects();
+						UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
+						return;
 					}
 				}
-				catch(...) {}
 				if (MouseAxis > 0.9f) {
 					index = (index + 1) % HoldPositions.Num();
 				}
@@ -123,20 +120,17 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 		return true;
 	}
 	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
-		try {
-			if (HoldingObjectArray[i]) {
-				if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
-					&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->Habitat == IncubatorHabitat) {
-					bIsSwappable = true;
-					bSwapIsAnimal = bIsAnimal;
-					SwapHabitat = IncubatorHabitat;
-					SelectedIndex = i;
-					RightHandObject = HoldingObjectArray[i];
-					return true;
-				}
+		if (HoldingObjectArray[i]) {
+			if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
+				&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->Habitat == IncubatorHabitat) {
+				bIsSwappable = true;
+				bSwapIsAnimal = bIsAnimal;
+				SwapHabitat = IncubatorHabitat;
+				SelectedIndex = i;
+				RightHandObject = HoldingObjectArray[i];
+				return true;
 			}
 		}
-		catch (...) {}
 	}
 	return false;
 }
@@ -206,14 +200,11 @@ AActor* UPlayerPick::UseRightHandObject() {
 	bIsSwappable = false;
 
 	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
-		try {
-			if (HoldingObjectArray[i] == RightHandObject) {
-				HoldingObjectArray[i] = nullptr;
-				UE_LOG(LogTemp, Warning, TEXT("Deleted"));
-				break;
-			}
+		if (HoldingObjectArray[i] == RightHandObject) {
+			HoldingObjectArray[i] = nullptr;
+			UE_LOG(LogTemp, Warning, TEXT("Deleted"));
+			break;
 		}
-		catch (...) {}
 	}
 
 	if (RightHandObject->FindComponentByClass<UHoldableObject>()) {

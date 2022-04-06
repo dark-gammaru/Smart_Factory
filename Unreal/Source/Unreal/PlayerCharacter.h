@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UCameraComponent;
+
 UCLASS()
 class UNREAL_API APlayerCharacter : public ACharacter
 {
@@ -21,6 +23,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UCameraComponent* PlayerCamera;
 
 
 private:

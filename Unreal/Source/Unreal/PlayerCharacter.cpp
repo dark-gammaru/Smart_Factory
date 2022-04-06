@@ -1,9 +1,18 @@
 
 #include "PlayerCharacter.h"
-
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+
+	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
+	PlayerCamera->SetupAttachment(GetCapsuleComponent());
+	PlayerCamera->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
+	PlayerCamera->bUsePawnControlRotation = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 

@@ -11,6 +11,7 @@
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCheckTimeDelegate, FDateTime, CurrentTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNightDelegate);
 
 UCLASS()
 class UNREAL_API USmartFactoryGameInstance : public UGameInstance
@@ -29,4 +30,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
 	FCheckTimeDelegate CheckTimeDelegate;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+	FNightDelegate NightDelegate;
 };
