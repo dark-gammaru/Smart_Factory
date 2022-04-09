@@ -78,13 +78,15 @@ void UPlayerPick::Swap(float MouseAxis) {
 			}
 			for (int32 i = 0; i < HoldingObjectArray.Num(); i++) {
 				if (HoldingObjectArray[index]) {
-					if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->bIsAnimal == bSwapIsAnimal
-						&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->Habitat == SwapHabitat) {
-						SelectedIndex = index;
-						RightHandObject = HoldingObjectArray[index];
-						ReorderObjects();
-						UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
-						return;
+					if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()) {
+						if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->IsAnimal() == bSwapIsAnimal
+							&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->GetHabitat() == SwapHabitat) {
+							SelectedIndex = index;
+							RightHandObject = HoldingObjectArray[index];
+							ReorderObjects();
+							UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
+							return;
+						}
 					}
 				}
 				if (MouseAxis > 0.9f) {
@@ -121,14 +123,16 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 	}
 	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
 		if (HoldingObjectArray[i]) {
-			if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->bIsAnimal == bIsAnimal
-				&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->Habitat == IncubatorHabitat) {
-				bIsSwappable = true;
-				bSwapIsAnimal = bIsAnimal;
-				SwapHabitat = IncubatorHabitat;
-				SelectedIndex = i;
-				RightHandObject = HoldingObjectArray[i];
-				return true;
+			if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()) {
+				if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->IsAnimal() == bIsAnimal
+					&& HoldingObjectArray[i]->FindComponentByClass<UCommodity>()->GetHabitat() == IncubatorHabitat) {
+					bIsSwappable = true;
+					bSwapIsAnimal = bIsAnimal;
+					SwapHabitat = IncubatorHabitat;
+					SelectedIndex = i;
+					RightHandObject = HoldingObjectArray[i];
+					return true;
+				}
 			}
 		}
 	}

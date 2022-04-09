@@ -36,7 +36,7 @@ private:
 	EHabitat IncubatorHabitat;
 
 	UCommodity* GrowingCommodityRef;
-	float CommodityGrowthDuration;
+	int32 CommodityGrowthDuration;
 
 	FDateTime StartGrowingTime;
 

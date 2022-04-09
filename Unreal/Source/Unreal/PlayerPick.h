@@ -57,9 +57,11 @@ public:
 private:
 	void Swap(float MouseAxis);
 
+	// Temporary save incubator's condition for swap.
 	bool bIsSwappable;
 	bool bSwapIsAnimal;
 	EHabitat SwapHabitat;
+
 	int32 SelectedIndex;
 
 	void ReorderObjects();

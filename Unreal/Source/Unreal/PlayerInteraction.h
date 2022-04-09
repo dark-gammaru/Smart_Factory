@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PlayerPick.h"
 #include "PlayerInteraction.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -28,13 +29,13 @@ public:
 	bool bIsInteractable = false;
 
 private:
-	class UPlayerPick* PlayerPickRef;
+	UPlayerPick* PlayerPickRef;
 	FHitResult GetFirstPhysicsBodyInReach() const;
 	FVector GetPlayersReach() const;
 	FVector GetPlayersWorldPos() const;
 
-	void Interact(void);
-	void IsInteractable(void);
+	void Interact();
+	void IsInteractable();
 
 	const float HandDistance = 150.f;
 };

@@ -9,8 +9,18 @@ UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UNREAL_API UCommodity : public UHoldableObject
 {
 	GENERATED_BODY()
-	
+
 public:
+	UFUNCTION(BlueprintCallable)
+	bool IsAnimal();
+
+	UFUNCTION(BlueprintCallable)
+	EHabitat GetHabitat();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetGrowthTime();
+	
+private:
 	UPROPERTY(EditAnywhere)
 	FString ScientificName;
 

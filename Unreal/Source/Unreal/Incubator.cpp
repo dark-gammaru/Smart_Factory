@@ -41,7 +41,7 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	}
 	CommodityRef->SetActorRelativeRotation(FQuat::Identity);
 	
-	CommodityGrowthDuration = (float)(GrowingCommodityRef->GrowthTime);
+	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
 }
 
@@ -83,7 +83,7 @@ void UIncubator::CheckTime(FDateTime CurrentTime) {
 /// <returns>Float percentage of growing progress.</returns>
 float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 	FTimespan Timespan = CurrentTime - StartGrowingTime;
-	return (Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration * 100;
+	return (float)(Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration * 100;
 }
 
 
