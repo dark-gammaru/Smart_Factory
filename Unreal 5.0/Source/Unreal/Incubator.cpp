@@ -43,6 +43,17 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
+	ResultRow = CommodityTable->FindRow<FCommodityRow>(*GrowingCommodityRef->GetName(), "");
+
+	if (ResultRow == nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("Table Error"));
+		return;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Success"));
+	}
+
+
 }
 
 

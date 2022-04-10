@@ -19,6 +19,8 @@ public:
 public:	
 	int32 GetWeight(void);
 
+	FString GetName();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	FString Name;

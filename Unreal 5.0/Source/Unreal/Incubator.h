@@ -4,6 +4,9 @@
 #include "CoreMinimal.h"
 #include "Commodity.h"
 #include "Components/ActorComponent.h"
+#include "DataTableRows.h"
+#include "Engine/DataTable.h"
+#include "HoldableObject.h"
 #include "HoldableObjectEnum.h"
 #include "Incubator.generated.h"
 
@@ -31,20 +34,26 @@ public:
 
 	void OpenUI();
 
+	UFUNCTION(BlueprintCallable)
+	void CheckTime(FDateTime CurrentTime);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* CommodityTable;
+
 private:
 	UPROPERTY(EditAnywhere)
 	EHabitat IncubatorHabitat;
 
-	UCommodity* GrowingCommodityRef;
-	int32 CommodityGrowthDuration;
-
-	FDateTime StartGrowingTime;
-
 	UPROPERTY(EditAnywhere)
 	bool bIsAnimal;
 
-	UFUNCTION(BlueprintCallable)
-	void CheckTime(FDateTime CurrentTime);
+	UCommodity* GrowingCommodityRef;
+	int32 CommodityGrowthDuration;
+
+	FCommodityRow* ResultRow;
+
+	FDateTime StartGrowingTime;
 
 	float CalculateProgress(FDateTime CurrentTime);
+
 };

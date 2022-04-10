@@ -30,4 +30,5 @@ enum class EProductCategory : uint8 {
 	Meat = 0 UMETA(DisplayName = "Meat"),
 	Vegetable = 1 UMETA(DisplayName = "Vegetable"),
 	Fruit = 2 UMETA(DisplayName = "Fruit"),
+	Drink = 3 UMETA(DisplayName = "Drink"),
 };
