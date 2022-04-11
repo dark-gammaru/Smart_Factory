@@ -85,11 +85,9 @@ DerivedDataCache/*
 ############
 #Asset Files#
 ###########
-*/Content/AssetFolderName1
-*/Content/AssetFolderName2
-*/Content/AssetFolderName3
 */Content/StarterContent
 */Content/Megascans
+*/Content/Resources
 
 ##################
 #VS Generated Files#
