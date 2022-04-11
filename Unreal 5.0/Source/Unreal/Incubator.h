@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "Commodity.h"
 #include "Components/ActorComponent.h"
-#include "DataTableRows.h"
+#include "DataTableRow.h"
 #include "Engine/DataTable.h"
 #include "HoldableObject.h"
 #include "HoldableObjectEnum.h"
@@ -56,4 +56,7 @@ private:
 
 	float CalculateProgress(FDateTime CurrentTime);
 
+	void SetPosition(AActor*);
+
+	void Manufacture();
 };

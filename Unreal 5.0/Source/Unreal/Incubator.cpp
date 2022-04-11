@@ -32,15 +32,9 @@ void UIncubator::OpenUI(void) {
 /// <param name="CommodityRef"> : Reference of Commodity</param>
 void UIncubator::PutCommodity(AActor* CommodityRef) {
 	GrowingCommodityRef = CommodityRef->FindComponentByClass<UCommodity>();
-	CommodityRef->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
-	if (!bIsAnimal) {
-		CommodityRef->SetActorRelativeLocation(FVector(0.f, 0.f, 160.f));
-	}
-	else {
-		CommodityRef->SetActorRelativeLocation(FVector(0.f, 0.f, 200.f));
-	}
-	CommodityRef->SetActorRelativeRotation(FQuat::Identity);
 	
+	SetPosition(CommodityRef);
+
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
 	ResultRow = CommodityTable->FindRow<FCommodityRow>(*GrowingCommodityRef->GetName(), "");
@@ -52,8 +46,17 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Success"));
 	}
+}
 
 
+void UIncubator::Manufacture() {
+	GrowingCommodityRef->GetOwner()->Destroy();
+	GrowingCommodityRef = nullptr;
+	AActor* Product = Cast<AActor>(GetWorld()->SpawnActor(ResultRow->Product));
+	Product->DisableComponentsSimulatePhysics();
+	SetPosition(Product);
+	Product->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	ResultRow = nullptr;
 }
 
 
@@ -79,7 +82,15 @@ bool UIncubator::IsEmpty() {
 /// <param name="CurrentTime"> : Current time from GameInstance.</param>
 void UIncubator::CheckTime(FDateTime CurrentTime) {
 	if (GrowingCommodityRef) {
-		CalculateProgress(CurrentTime);
+		if (CalculateProgress(CurrentTime) >= 10.f) {
+			Manufacture();
+		}
+		else if (CalculateProgress(CurrentTime) >= 100.f) {
+			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->FinalModel);
+		}
+		else if (CalculateProgress(CurrentTime) >= 50.f) {
+			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->MiddleModel);
+		}
 		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), CalculateProgress(CurrentTime));
 	}
 	else {
@@ -98,3 +109,17 @@ float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 }
 
 
+/// <summary>
+/// Set relative position of actor to center of incubator.
+/// </summary>
+/// <param name="TargetActor">Actor to move position.</param>
+void UIncubator::SetPosition(AActor* TargetActor) {
+	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
+	if (!bIsAnimal) {
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 0.f, 160.f));
+	}
+	else {
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 0.f, 200.f));
+	}
+	TargetActor->SetActorRelativeRotation(FQuat::Identity);
+}

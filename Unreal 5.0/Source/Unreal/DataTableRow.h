@@ -6,12 +6,12 @@
 #include "Engine/StaticMesh.h"	
 #include "Engine/BlueprintGeneratedClass.h"
 #include "CoreMinimal.h"
-#include "DataTableRows.generated.h"
+#include "GameFramework/Actor.h"
+#include "DataTableRow.generated.h"
 
 /**
- * 
+ *
  */
-
 USTRUCT(BlueprintType)
 struct FCommodityRow : public FTableRowBase
 {
@@ -19,18 +19,22 @@ struct FCommodityRow : public FTableRowBase
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UBlueprintGeneratedClass* Product;
+        UBlueprintGeneratedClass* Product;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UStaticMesh* MiddleModel;
+        UStaticMesh* MiddleModel;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UStaticMesh* FinalModel;
+        UStaticMesh* FinalModel;
 };
 
-class UNREAL_API DataTableRows
+UCLASS()
+class UNREAL_API ADataTableRow : public AActor
 {
-public:
-	DataTableRows();
-	~DataTableRows();
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	ADataTableRow();
+
 };
