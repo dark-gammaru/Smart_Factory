@@ -37,5 +37,5 @@ private:
 	void Interact();
 	void IsInteractable();
 
-	const float HandDistance = 150.f;
+	const float HandDistance = 170.f;
 };

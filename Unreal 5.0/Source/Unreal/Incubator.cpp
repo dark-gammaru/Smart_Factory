@@ -82,7 +82,7 @@ bool UIncubator::IsEmpty() {
 /// <param name="CurrentTime"> : Current time from GameInstance.</param>
 void UIncubator::CheckTime(FDateTime CurrentTime) {
 	if (GrowingCommodityRef) {
-		if (CalculateProgress(CurrentTime) >= 10.f) {
+		if (CalculateProgress(CurrentTime) >= 120.f) {
 			Manufacture();
 		}
 		else if (CalculateProgress(CurrentTime) >= 100.f) {
