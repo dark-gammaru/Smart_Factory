@@ -2,6 +2,8 @@
 #include "PlayerPick.h"
 #include "Kismet/GameplayStatics.h"
 #include "Commodity.h"
+#include "FurnatureKit.h"
+#include "PlayerInteraction.h"
 #include "HoldableObject.h"
 
 UPlayerPick::UPlayerPick()
@@ -60,6 +62,12 @@ void UPlayerPick::Pick(FHitResult Hit) {
 	HoldingObjectArray[HoldingObjectCount] = ComponentToPick;
 
 	++HoldingObjectCount;
+
+	if (ComponentToPick->FindComponentByClass<UFurnatureKit>()) {
+		PlayerCharacterRef->FindComponentByClass<UPlayerInteraction>()->bIsConstructing = true;
+		HologramFurnature = GetWorld()->SpawnActor(ComponentToPick->FindComponentByClass<UFurnatureKit>()->HologramFurnatureBP);
+		UE_LOG(LogTemp, Warning, TEXT("Furnature picked"));
+	}
 }
 
 /// <summary>
@@ -78,7 +86,7 @@ void UPlayerPick::Swap(float MouseAxis) {
 			}
 			for (int32 i = 0; i < HoldingObjectArray.Num(); i++) {
 				if (HoldingObjectArray[index]) {
-					if (HoldingObjectArray[i]->FindComponentByClass<UCommodity>()) {
+					if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()) {
 						if (HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->IsAnimal() == bSwapIsAnimal
 							&& HoldingObjectArray[index]->FindComponentByClass<UCommodity>()->GetHabitat() == SwapHabitat) {
 							SelectedIndex = index;
@@ -111,7 +119,7 @@ bool UPlayerPick::IsPickable(FHitResult Hit) {
 }
 
 /// <summary>
-/// Check if player could Interact with certain incubator. 
+/// Check if player could interact with certain incubator. 
 /// Set proper object's position to right hand. [LSH]
 /// </summary>
 /// <param name="bIsAnimal"> : Whether the incubator is for animal or not.</param>
@@ -137,6 +145,26 @@ bool UPlayerPick::IsInteractable(bool bIsAnimal, EHabitat IncubatorHabitat) {
 		}
 	}
 	return false;
+}
+
+/// <summary>
+/// Check if player could construct a furnature. [LSH]
+/// </summary>
+/// <returns></returns>
+void UPlayerPick::SetRightHand() {
+	if (bIsSwappable) {
+		return;
+	}
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
+		if (HoldingObjectArray[i]) {
+			if (HoldingObjectArray[i]->FindComponentByClass<UFurnatureKit>()) {
+				bIsSwappable = true;
+				SelectedIndex = i;
+				RightHandObject = HoldingObjectArray[i];
+				return;
+			}
+		}
+	}
 }
 
 /// <summary>
@@ -221,4 +249,42 @@ AActor* UPlayerPick::UseRightHandObject() {
 	RightHandObject = nullptr;
 	--HoldingObjectCount;
 	return ReturnRef;
+}
+
+/// <summary>
+/// Set hologram position.
+/// </summary>
+/// <param name="HitLocation">Raycast hit position on floor.</param>
+/// <param name="Rotator">FRotator of player rotation.</param>
+void UPlayerPick::SetHologramPosition(FVector HitLocation, FRotator Rotator) {
+	if (HologramFurnature) {
+		// You must disable physics in order to change actor's location.
+		HologramFurnature->DisableComponentsSimulatePhysics();
+		HologramFurnature->SetActorLocationAndRotation(HitLocation, FRotator(0.0, Rotator.Yaw + 90.0, 0.0), false, nullptr, ETeleportType::TeleportPhysics);
+		HologramFurnature->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
+	}
+}
+
+
+/// <summary>
+/// Destroy hologram furnature and spawn new furniture to hologram's position.
+/// </summary>
+void UPlayerPick::ConstructFurnature() {
+	// Save location and rotation of furnature, and destroy furnature actor.
+	FVector FurnatureLocation = HologramFurnature->GetActorLocation();
+	FRotator FurnatureRotation = HologramFurnature->GetActorRotation();
+	HologramFurnature->Destroy();
+	HologramFurnature = nullptr;
+
+	// Delete reference of furnature object from PlayerPick script.
+	AActor* Furnature = UseRightHandObject();
+
+	// Spawn new furnature and set location and rotation.
+	AActor* SpawnedFurnature = GetWorld()->SpawnActor(Furnature->FindComponentByClass<UFurnatureKit>()->FurnatureBP);
+	SpawnedFurnature->GetRootComponent()->SetMobility(EComponentMobility::Movable);
+	SpawnedFurnature->SetActorLocationAndRotation(FurnatureLocation, FurnatureRotation);
+	SpawnedFurnature->GetRootComponent()->SetMobility(EComponentMobility::Static);
+
+	// Destroy furnature kit.
+	Furnature->Destroy();
 }

@@ -30,7 +30,12 @@ public:
 	// Used for Incubater check
 	bool IsInteractable(bool, EHabitat);
 
+	// Used for FurnatureKit
+	void SetRightHand();
+
 	AActor* UseRightHandObject();
+
+	void SetHologramPosition(FVector, FRotator);
 
 
 private:
@@ -50,6 +55,7 @@ private:
 
 	void HoldRightHand();
 
+
 #pragma region Swap
 public:
 	void ResetSwapValues();
@@ -68,4 +74,13 @@ private:
 
 #pragma endregion
 
+
+#pragma region Construct
+public:
+	void ConstructFurnature();
+
+private:
+	AActor* HologramFurnature;
+
+#pragma endregion
 };

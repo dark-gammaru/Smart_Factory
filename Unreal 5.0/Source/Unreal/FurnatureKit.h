@@ -4,17 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "HoldableObject.h"
-#include "Furnature.generated.h"
+#include "FurnatureKit.generated.h"
 
 /**
  * 
  */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class UNREAL_API UFurnature : public UHoldableObject
+class UNREAL_API UFurnatureKit : public UHoldableObject
 {
 	GENERATED_BODY()
 	
-private:
-//	UPROPERTY(EditAnywhere)
+public:
+	UPROPERTY(EditAnywhere)
+	UBlueprintGeneratedClass* HologramFurnatureBP;
 
+	UPROPERTY(EditAnywhere)
+	UBlueprintGeneratedClass* FurnatureBP;
 };
