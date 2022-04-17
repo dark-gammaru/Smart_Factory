@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "HoldableObject.h"
+#include "PlayerLineTrace.h"
 #include "FurnatureKit.generated.h"
 
-/**
- * 
- */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UNREAL_API UFurnatureKit : public UHoldableObject
 {
@@ -20,4 +18,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UBlueprintGeneratedClass* FurnatureBP;
+
+	void SpawnHologram();
+	void SetHologramPosition(FVector, FRotator);
+	void SpawnFurnature();
+
+private:
+	AActor* HologramFurnature;
 };

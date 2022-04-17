@@ -1,10 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "PlayerPick.h"
+#include "PlayerHand.h"
+#include "PlayerLineTrace.h"
+#include "LineTraceFloorStrategy.h"
+#include "LineTraceObjectStrategy.h"
 #include "PlayerInteraction.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -33,24 +35,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsConstructable = false;
 
-	bool bIsConstructing = false;
-
 private:
-	UPlayerPick* PlayerPickRef;
-	FHitResult GetObjectInReach() const;
-	FHitResult GetFloorInReach() const;
-	FVector GetPlayersReach() const;
-	FVector GetPlayerLocation() const;
-	FRotator GetPlayerRotation() const;
-	FCollisionObjectQueryParams FloorTraceObjectParams;
+	UPlayerHand* PlayerHandRef;
+	UPlayerLineTrace* PlayerLineTraceRef;
 
 	void Interact();
 	void IsInteractable();
 	void IsConstructable();
-
-	const float HandDistance = 170.f;
-	const float ConstructDistance = 500.f;
-
-	const ECollisionChannel FLOOR_COLLISION_CHANNEL = ECollisionChannel::ECC_GameTraceChannel1;
-	const ECollisionChannel WALL_COLLISION_CHANNEL = ECollisionChannel::ECC_GameTraceChannel2;
+	
 };

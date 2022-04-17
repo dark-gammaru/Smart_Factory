@@ -1,7 +1,9 @@
 
+
 #include "PlayerInteraction.h"
-#include "PlayerPick.h"
 #include "HoldableObject.h"
+#include "FurnatureKit.h"
+#include "PlayerLineTrace.h"
 #include "Engine/StaticMeshActor.h"
 #include "Incubator.h"
 
@@ -17,18 +19,15 @@ void UPlayerInteraction::BeginPlay()
 	UInputComponent* InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	InputComponent->BindAction(TEXT("Click"), IE_Pressed, this, &UPlayerInteraction::Interact);
 
-	PlayerPickRef = GetOwner()->FindComponentByClass<UPlayerPick>();
-
-	// Floor traces only with wall and floor
-	FloorTraceObjectParams.AddObjectTypesToQuery(FLOOR_COLLISION_CHANNEL);
-	FloorTraceObjectParams.AddObjectTypesToQuery(WALL_COLLISION_CHANNEL);
+	PlayerHandRef = GetOwner()->FindComponentByClass<UPlayerHand>();
+	PlayerLineTraceRef = GetOwner()->FindComponentByClass<UPlayerLineTrace>();
 }
 
 void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bIsConstructing) {
+	if (PlayerLineTraceRef->bIsConstructing) {
 		IsConstructable();
 	}
 	else {
@@ -36,49 +35,53 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	}
 }
 
+
 // Check if player can construct and change GUI. [LSH]
-void UPlayerInteraction::IsConstructable(void) {
-	FHitResult Hit = GetFloorInReach();
+void UPlayerInteraction::IsConstructable() {
+	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
 	bIsHit = true;
-	if (Hit.GetActor() && Hit.GetActor()->ActorHasTag("Floor")) {
-		PlayerPickRef->SetRightHand();
-		PlayerPickRef->SetHologramPosition(Hit.Location, GetPlayerRotation());
-		bIsInteractable = true;
+	if (Hit.GetActor()) {
+		if (Hit.GetActor()->ActorHasTag("Floor")) {
+			PlayerHandRef->SetRightHand();
+			PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
+				->SetHologramPosition(Hit.Location, PlayerLineTraceRef->GetPlayerRotation());
+			bIsInteractable = true;
+		}
 	}
 	else {
-		/*
-		Hit = GetFirstObjectInReach();
+		
+		Hit = PlayerLineTraceRef->ForceLineTraceObject();
+
 		if (Hit.GetActor()) {
-			// TODO : Check dust chute
+			// TODO : Check dust chute : change interactable to true
 		}
-		*/
-		PlayerPickRef->SetHologramPosition(FVector(0., -1000., 0.), GetPlayerRotation());
-		PlayerPickRef->ResetSwapValues();
+		
+		PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
+			->SetHologramPosition(FVector(0., -1000., 0.), PlayerLineTraceRef->GetPlayerRotation());
+		PlayerHandRef->ResetSwapValues();
 		bIsInteractable = false;
 	}
 }
 
 // Check if an object is interactable and change GUI. [LSH]
-void UPlayerInteraction::IsInteractable(void) {
-	FHitResult Hit = GetObjectInReach();
+void UPlayerInteraction::IsInteractable() {
+	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
 	bIsHit = false;
-	if (Hit.GetActor()) {
-		if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
+	if (auto HitActor = Hit.GetActor()) {
+		if (auto HitHoldableObject = HitActor->FindComponentByClass<UHoldableObject>()) {
 			bIsHit = true;
-			if (PlayerPickRef->IsPickable(Hit)) {
+			if (PlayerHandRef->IsHoldable(HitHoldableObject)) {
 				bIsInteractable = true;
 			}
 			else {
 				bIsInteractable = false;
 			}
 		}
-		else if (Hit.GetActor()->FindComponentByClass<UIncubator>()) {
+		else if (auto HitIncubator = Hit.GetActor()->FindComponentByClass<UIncubator>()) {
 			bIsHit = true;
-			auto IncubatorRef = Hit.GetActor()->FindComponentByClass<UIncubator>();
 			// If you have appropreate commodity, hold it with right hand
-			if (IncubatorRef->IsEmpty()) {
-				if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
-				}
+			if (HitIncubator->IsEmpty()) {
+				PlayerHandRef->IsInteractable(HitIncubator);
 			}
 			// Player can always interact with incubator.
 			bIsInteractable = true;
@@ -88,51 +91,51 @@ void UPlayerInteraction::IsInteractable(void) {
 		}
 	}
 	else {
-		PlayerPickRef->ResetSwapValues();
+		PlayerHandRef->ResetSwapValues();
 	}
 }
 
 // Interact with objects. [LSH]
-void UPlayerInteraction::Interact(void) {
-	FHitResult Hit = GetObjectInReach();
-	if (Hit.GetActor()) {
+void UPlayerInteraction::Interact() {
+	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
+	if (auto HitActor = Hit.GetActor()) {
 		bIsHit = true;
 		// If you are constructing, check validity and construct.
-		if (bIsConstructing) {
+		if (PlayerLineTraceRef->bIsConstructing) {
 			if (bIsConstructable && bIsInteractable) {
-				PlayerPickRef->ConstructFurnature();
+				auto PlayerKit = PlayerHandRef->UseRightHand();
+				PlayerKit->FindComponentByClass<UFurnatureKit>()->SpawnFurnature();
 				bIsConstructable = false;
-				bIsConstructing = false;
+				PlayerLineTraceRef->bIsConstructing = false;
 			}
 		}
 		else {
 			// If you can grab it, hold it.
-			if (Hit.GetActor()->FindComponentByClass<UHoldableObject>()) {
-				if (PlayerPickRef->IsPickable(Hit)) {
+			if (auto HitHoldableObject = HitActor->FindComponentByClass<UHoldableObject>()) {
+				if (PlayerHandRef->IsHoldable(HitHoldableObject)) {
 					UE_LOG(LogTemp, Warning, TEXT("GRAB"));
 					bIsInteractable = true;
-					PlayerPickRef->Pick(Hit);
+					PlayerHandRef->Hold(HitActor);
 				}
 				else {
 					bIsInteractable = false;
 				}
 			}
-			else if (Hit.GetActor()->FindComponentByClass<UIncubator>()) {
-				auto IncubatorRef = Hit.GetActor()->FindComponentByClass<UIncubator>();
+			else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
 				// Player can always interact with incubator.
 				bIsInteractable = true;
 				// If you have appropreate commodity, start growing commodity immediately.
-				if (IncubatorRef->IsEmpty()) {
-					if (PlayerPickRef->IsInteractable(IncubatorRef->IsAnimal(), IncubatorRef->GetHabitat())) {
-						IncubatorRef->PutCommodity(PlayerPickRef->UseRightHandObject());
+				if (HitIncubator->IsEmpty()) {
+					if (PlayerHandRef->IsInteractable(HitIncubator)) {
+						HitIncubator->PutCommodity(PlayerHandRef->UseRightHand());
 					}
 					else {
-						IncubatorRef->OpenUI();
+						HitIncubator->OpenUI();
 					}
 				}
 				// If not, open incubator UI.
 				else {
-					IncubatorRef->OpenUI();
+					HitIncubator->OpenUI();
 				}
 			}
 			else {
@@ -145,95 +148,5 @@ void UPlayerInteraction::Interact(void) {
 	}
 }
 
-/// <summary>
-/// Get player camera position and return it. [LSH]
-/// </summary>
-/// <returns>FVector of player camera position</returns>
-FVector UPlayerInteraction::GetPlayerLocation() const {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
 
-	// Get player's camera position and rotation
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
-	);
 
-	// Return player camera's location
-	return PlayerViewPointLocation;
-}
-
-/// <summary>
-/// Get player camera rotation and return it. [LSH]
-/// </summary>
-/// <returns>FRotator of player camera rotation.</returns>
-FRotator UPlayerInteraction::GetPlayerRotation() const {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	// Get player's camera position and rotation
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
-	);
-
-	// Return player camera's rotation
-	return PlayerViewPointRotation;
-}
-
-/// <summary>
-/// Calculate raycast end point vector with player viewpoint and float HandDistance [LSH]
-/// </summary>
-/// <returns>FVector of player camera position to raycast end point</returns>
-FVector UPlayerInteraction::GetPlayersReach() const {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	// Get player camera's position and rotation
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation
-	);
-
-	// Make vector from Rotation, Location, Distance
-	if (bIsConstructing) {
-		return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * ConstructDistance;
-	}
-	else {
-		return PlayerViewPointLocation + PlayerViewPointRotation.Vector() * HandDistance;
-	}
-}
-
-/// <summary>
-/// Raycast with FVector from GetPlayersWorldPos() and GetPlayersReach() [LSH]
-/// </summary>
-/// <returns>Raycast result FHitResult</returns>
-FHitResult UPlayerInteraction::GetObjectInReach() const {
-	FHitResult Hit;
-	FCollisionQueryParams ObjectQueryParams(FName(TEXT("")), false, GetOwner());
-	GetWorld()->LineTraceSingleByObjectType(
-		OUT Hit,
-		GetPlayerLocation(),
-		GetPlayersReach(),
-		FCollisionObjectQueryParams(FCollisionObjectQueryParams::DefaultObjectQueryParam),
-		ObjectQueryParams
-	);
-	return Hit;
-}
-
-/// <summary>
-/// Only raycast to floor and wall, with FVector from GetPlayersWorldPos() and GetPlayersReach() [LSH]
-/// </summary>
-/// <returns>Raycast result FHitResult</returns>
-FHitResult UPlayerInteraction::GetFloorInReach() const {
-	FHitResult Hit;
-	FCollisionQueryParams FloorQueryParams(FName(TEXT("")), false, GetOwner());
-	GetWorld()->LineTraceSingleByObjectType(
-		OUT Hit,
-		GetPlayerLocation(),
-		GetPlayersReach(),
-		FloorTraceObjectParams,
-		FloorQueryParams
-	);
-	return Hit;
-}

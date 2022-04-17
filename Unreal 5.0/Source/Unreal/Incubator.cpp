@@ -26,6 +26,15 @@ void UIncubator::OpenUI(void) {
 	UE_LOG(LogTemp, Warning, TEXT("Open Incubator Successed"));
 }
 
+bool UIncubator::IsInteractable(UCommodity* Item) {
+	if (Item->IsAnimal() == bIsAnimal && Item->GetHabitat() == IncubatorHabitat) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 /// <summary>
 /// Start growing commodity. Set parent, position of commodity and save growing time. [LSH]
 /// </summary>
@@ -48,7 +57,9 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	}
 }
 
-
+/// <summary>
+/// Destroy growing commodity and spawn product. [LSH]
+/// </summary>
 void UIncubator::Manufacture() {
 	GrowingCommodityRef->GetOwner()->Destroy();
 	GrowingCommodityRef = nullptr;

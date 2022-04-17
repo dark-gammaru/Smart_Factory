@@ -40,6 +40,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* CommodityTable;
 
+	bool IsInteractable(UCommodity*);
+
 private:
 	UPROPERTY(EditAnywhere)
 	EHabitat IncubatorHabitat;
