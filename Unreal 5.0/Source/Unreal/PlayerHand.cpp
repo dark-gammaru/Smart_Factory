@@ -77,6 +77,7 @@ void UPlayerHand::Hold(AActor* Target) {
 	if (auto TargetKit = Target->FindComponentByClass<UFurnatureKit>()) {
 		TargetKit->SpawnHologram();
 		PlayerCharacterRef->FindComponentByClass<UPlayerLineTrace>()->bIsConstructing = true;
+		SetRightHand();
 	}
 }
 

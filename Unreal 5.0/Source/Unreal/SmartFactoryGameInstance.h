@@ -6,11 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "SmartFactoryGameInstance.generated.h"
 
-/**
- * 
- */
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCheckTimeDelegate, FDateTime, CurrentTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrencySpendDelegate, int32, Currency);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNightDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMorningDelegate);
 
@@ -30,7 +27,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsNight;
 
+	UFUNCTION(BlueprintCallable)
 	FDateTime GetGameTime();
+
+	UFUNCTION(BlueprintCallable)
+	void CurrencyChange(int32 Amount);
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
 	FCheckTimeDelegate CheckTimeDelegate;
@@ -40,4 +41,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
 	FMorningDelegate MorningDelegate;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+	FCurrencySpendDelegate CurrencyDelegate;
 };

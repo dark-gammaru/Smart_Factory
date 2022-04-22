@@ -13,7 +13,7 @@
  *
  */
 USTRUCT(BlueprintType)
-struct FCommodityRow : public FTableRowBase
+struct FProductRow : public FTableRowBase
 {
     GENERATED_BODY()
 
@@ -28,13 +28,24 @@ public:
         UStaticMesh* FinalModel;
 };
 
+USTRUCT(BlueprintType)
+struct FHoldableObjectRow : public FTableRowBase 
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UBlueprintGeneratedClass* Object;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UTexture2D* Image;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 Price;
+};
+
 UCLASS()
 class UNREAL_API ADataTableRow : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ADataTableRow();
-
 };

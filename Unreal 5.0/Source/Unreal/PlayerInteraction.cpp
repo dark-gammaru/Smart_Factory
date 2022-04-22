@@ -39,13 +39,18 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 // Check if player can construct and change GUI. [LSH]
 void UPlayerInteraction::IsConstructable() {
 	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
-	bIsHit = true;
+	bIsHit = false;
 	if (Hit.GetActor()) {
+		bIsHit = true;
 		if (Hit.GetActor()->ActorHasTag("Floor")) {
-			PlayerHandRef->SetRightHand();
 			PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
 				->SetHologramPosition(Hit.Location, PlayerLineTraceRef->GetPlayerRotation());
 			bIsInteractable = true;
+		}
+		else {
+			PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
+				->SetHologramPosition(FVector(0., -1000., 0.), PlayerLineTraceRef->GetPlayerRotation());
+			bIsInteractable = false;
 		}
 	}
 	else {
@@ -53,12 +58,13 @@ void UPlayerInteraction::IsConstructable() {
 		Hit = PlayerLineTraceRef->ForceLineTraceObject();
 
 		if (Hit.GetActor()) {
+			bIsHit = true;
 			// TODO : Check dust chute : change interactable to true
 		}
 		
 		PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
 			->SetHologramPosition(FVector(0., -1000., 0.), PlayerLineTraceRef->GetPlayerRotation());
-		PlayerHandRef->ResetSwapValues();
+
 		bIsInteractable = false;
 	}
 }

@@ -15,3 +15,7 @@ FString UHoldableObject::GetName() {
 	return Name;
 }
 
+int32 UHoldableObject::GetPrice() {
+	return Price;
+}
+

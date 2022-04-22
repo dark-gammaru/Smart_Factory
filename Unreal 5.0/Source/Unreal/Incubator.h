@@ -52,7 +52,7 @@ private:
 	UCommodity* GrowingCommodityRef;
 	int32 CommodityGrowthDuration;
 
-	FCommodityRow* ResultRow;
+	FProductRow* ResultRow;
 
 	FDateTime StartGrowingTime;
 

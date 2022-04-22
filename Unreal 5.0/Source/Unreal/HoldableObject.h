@@ -19,7 +19,11 @@ public:
 public:	
 	int32 GetWeight(void);
 
+	UFUNCTION(BlueprintCallable)
 	FString GetName();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetPrice();
 
 protected:
 	UPROPERTY(EditAnywhere)

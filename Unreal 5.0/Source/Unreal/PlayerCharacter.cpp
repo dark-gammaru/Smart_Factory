@@ -6,7 +6,7 @@
 APlayerCharacter::APlayerCharacter()
 {
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 15.f);
+	GetCapsuleComponent()->InitCapsuleSize(90.f, 15.f);
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(GetCapsuleComponent());

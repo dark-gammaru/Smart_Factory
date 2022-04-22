@@ -5,14 +5,14 @@
 UPlayerLineTrace::UPlayerLineTrace()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	LineTraceObject = new LineTraceObjectStrategy(GetOwner(), GetWorld());
+	LineTraceFloor = new LineTraceFloorStrategy(GetOwner(), GetWorld());
 }
 
 void UPlayerLineTrace::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LineTraceObject = new LineTraceObjectStrategy(GetOwner(), GetWorld());
-	LineTraceFloor = new LineTraceFloorStrategy(GetOwner(), GetWorld());
 	ActiveLineTrace = LineTraceObject;
 }
 
