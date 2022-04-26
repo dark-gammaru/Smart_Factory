@@ -15,9 +15,6 @@ public:
 
 private:
 	const float ConstructDistance = 500.f;
-
-	FCollisionObjectQueryParams FloorTraceObjectParams;
-	const ECollisionChannel FLOOR_COLLISION_CHANNEL = ECollisionChannel::ECC_GameTraceChannel1;
-	const ECollisionChannel WALL_COLLISION_CHANNEL = ECollisionChannel::ECC_GameTraceChannel2;
-
+	const float ObjectDistance = 170.f;
+	ETraceTypeQuery FurnatureTraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 };

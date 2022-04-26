@@ -27,7 +27,6 @@ public:
 	bool bIsConstructing = false;
 
 	FRotator GetPlayerRotation();
-	FHitResult ForceLineTraceObject();
 
 private:
 	FHitResult HitResult;

@@ -14,11 +14,11 @@ LineTraceObjectStrategy::LineTraceObjectStrategy(AActor* OwnerRef, UWorld* World
 FHitResult LineTraceObjectStrategy::GetReach() const {
 	FHitResult Hit;
 	FCollisionQueryParams ObjectQueryParams(FName(TEXT("")), false, OwnerRef);
-	WorldRef->LineTraceSingleByObjectType(
+	WorldRef->LineTraceSingleByChannel(
 		OUT Hit,
 		GetPlayerLocation(),
 		GetPlayersReach(ObjectDistance),
-		FCollisionObjectQueryParams(FCollisionObjectQueryParams::DefaultObjectQueryParam),
+		ECollisionChannel(ObjectTraceChannel),
 		ObjectQueryParams
 	);
 	return Hit;

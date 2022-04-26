@@ -7,8 +7,16 @@ void UFurnatureKit::SpawnHologram() {
 	HologramFurnature = GetWorld()->SpawnActor(HologramFurnatureBP);
 }
 
+// Destroy hologram object. [LSH]
+void UFurnatureKit::DestroyHologram() {
+	if (HologramFurnature) {
+		HologramFurnature->Destroy();
+		HologramFurnature = nullptr;
+	}
+}
+
 /// <summary>
-/// Set hologram position.
+/// Set hologram position. [LSH]
 /// </summary>
 /// <param name="HitLocation">Raycast hit position on floor.</param>
 /// <param name="Rotator">FRotator of player rotation.</param>
@@ -23,14 +31,14 @@ void UFurnatureKit::SetHologramPosition(FVector HitLocation, FRotator Rotator) {
 
 
 /// <summary>
-/// Destroy hologram furnature and spawn new furniture to hologram's position.
+/// Destroy hologram furnature and spawn new furniture to hologram's position. [LSH]
 /// </summary>
 void UFurnatureKit::SpawnFurnature() {
 	// Save location and rotation of furnature, and destroy furnature actor.
 	FVector FurnatureLocation = HologramFurnature->GetActorLocation();
 	FRotator FurnatureRotation = HologramFurnature->GetActorRotation();
-	HologramFurnature->Destroy();
-	HologramFurnature = nullptr;
+
+	DestroyHologram();
 
 	// Spawn new furnature and set location and rotation.
 	AActor* SpawnedFurnature = GetWorld()->SpawnActor(FurnatureBP);

@@ -3,6 +3,7 @@
 #include "PlayerInteraction.h"
 #include "HoldableObject.h"
 #include "FurnatureKit.h"
+#include "GarbageChute.h"
 #include "PlayerLineTrace.h"
 #include "Engine/StaticMeshActor.h"
 #include "Incubator.h"
@@ -40,31 +41,32 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 void UPlayerInteraction::IsConstructable() {
 	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
 	bIsHit = false;
-	if (Hit.GetActor()) {
-		bIsHit = true;
-		if (Hit.GetActor()->ActorHasTag("Floor")) {
+	if (auto TargetActor = Hit.GetActor()) {
+		// If hit target is floor, move hologram to hit position.
+		// It is interactable if hologram is not overlapping with anything.
+		if (TargetActor->ActorHasTag("Floor")) {
+			bIsHit = true;
 			PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
 				->SetHologramPosition(Hit.Location, PlayerLineTraceRef->GetPlayerRotation());
-			bIsInteractable = true;
+			bIsInteractable = bIsConstructable;
 		}
+		// If hit target is garbage chute, activate chute and prepare to sell a kit.
+		else if (auto HitGarbageChute = TargetActor->FindComponentByClass<UGarbageChute>()) {
+			bIsHit = true;
+			auto ResultTuple = PlayerHandRef->IsInteractableGarbageChute();
+			bIsInteractable = ResultTuple.Key;
+			HitGarbageChute->Activate(ResultTuple.Value);
+			DeactivateTarget = HitGarbageChute; 
+			MoveHologramAway();
+		}
+		// If hit target is not floor nor garbage chute, set cursor disabled.
 		else {
-			PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
-				->SetHologramPosition(FVector(0., -1000., 0.), PlayerLineTraceRef->GetPlayerRotation());
+			MoveHologramAway();
 			bIsInteractable = false;
 		}
 	}
 	else {
-		
-		Hit = PlayerLineTraceRef->ForceLineTraceObject();
-
-		if (Hit.GetActor()) {
-			bIsHit = true;
-			// TODO : Check dust chute : change interactable to true
-		}
-		
-		PlayerHandRef->GetRightHand()->FindComponentByClass<UFurnatureKit>()
-			->SetHologramPosition(FVector(0., -1000., 0.), PlayerLineTraceRef->GetPlayerRotation());
-
+		MoveHologramAway();
 		bIsInteractable = false;
 	}
 }
@@ -76,28 +78,33 @@ void UPlayerInteraction::IsInteractable() {
 	if (auto HitActor = Hit.GetActor()) {
 		if (auto HitHoldableObject = HitActor->FindComponentByClass<UHoldableObject>()) {
 			bIsHit = true;
-			if (PlayerHandRef->IsHoldable(HitHoldableObject)) {
-				bIsInteractable = true;
+			bIsInteractable = PlayerHandRef->IsHoldable(HitHoldableObject);
+		}
+		else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
+			bIsHit = true;
+			bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
+		}
+		else if (auto HitGarbageChute = HitActor->FindComponentByClass<UGarbageChute>()) {
+			bIsHit = true;
+			auto ResultTuple = PlayerHandRef->IsInteractableGarbageChute();
+			bIsInteractable = ResultTuple.Key;
+			if (ResultTuple.Key) {
+				HitGarbageChute->Activate(ResultTuple.Value);
+				DeactivateTarget = HitGarbageChute;
 			}
 			else {
 				bIsInteractable = false;
+				Deactivate();
 			}
-		}
-		else if (auto HitIncubator = Hit.GetActor()->FindComponentByClass<UIncubator>()) {
-			bIsHit = true;
-			// If you have appropreate commodity, hold it with right hand
-			if (HitIncubator->IsEmpty()) {
-				PlayerHandRef->IsInteractable(HitIncubator);
-			}
-			// Player can always interact with incubator.
-			bIsInteractable = true;
 		}
 		else {
-			bIsInteractable = false;
+			PlayerHandRef->ResetSwapValues();
+			Deactivate();
 		}
 	}
 	else {
 		PlayerHandRef->ResetSwapValues();
+		Deactivate();
 	}
 }
 
@@ -105,54 +112,62 @@ void UPlayerInteraction::IsInteractable() {
 void UPlayerInteraction::Interact() {
 	FHitResult Hit = PlayerLineTraceRef->GetHitResult();
 	if (auto HitActor = Hit.GetActor()) {
-		bIsHit = true;
 		// If you are constructing, check validity and construct.
 		if (PlayerLineTraceRef->bIsConstructing) {
-			if (bIsConstructable && bIsInteractable) {
-				auto PlayerKit = PlayerHandRef->UseRightHand();
-				PlayerKit->FindComponentByClass<UFurnatureKit>()->SpawnFurnature();
-				bIsConstructable = false;
+			// If hit target is garbage chute, sell furnature kit.
+			if (auto HitGarbageChute = HitActor->FindComponentByClass<UGarbageChute>()) {
+				if (PlayerHandRef->IsInteractableGarbageChute().Key) {
+					auto PlayerKit = PlayerHandRef->UseRightHand();
+					PlayerKit->FindComponentByClass<UFurnatureKit>()->DestroyHologram();
+					HitGarbageChute->SellObject(PlayerKit);
+					PlayerLineTraceRef->bIsConstructing = false;
+					return;
+				}
+			}
+			// If it is constructable, then spawn furnature.
+			else if (bIsConstructable && bIsInteractable) {
+				PlayerHandRef->UseRightHand()->FindComponentByClass<UFurnatureKit>()->SpawnFurnature();
 				PlayerLineTraceRef->bIsConstructing = false;
 			}
 		}
 		else {
-			// If you can grab it, hold it.
+			// If you can grab holdable object, hold it.
 			if (auto HitHoldableObject = HitActor->FindComponentByClass<UHoldableObject>()) {
 				if (PlayerHandRef->IsHoldable(HitHoldableObject)) {
 					UE_LOG(LogTemp, Warning, TEXT("GRAB"));
-					bIsInteractable = true;
 					PlayerHandRef->Hold(HitActor);
 				}
-				else {
-					bIsInteractable = false;
-				}
 			}
+			// If you have appropreate commodity, start growing commodity immediately.
 			else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
-				// Player can always interact with incubator.
-				bIsInteractable = true;
-				// If you have appropreate commodity, start growing commodity immediately.
-				if (HitIncubator->IsEmpty()) {
-					if (PlayerHandRef->IsInteractable(HitIncubator)) {
-						HitIncubator->PutCommodity(PlayerHandRef->UseRightHand());
-					}
-					else {
-						HitIncubator->OpenUI();
-					}
-				}
-				// If not, open incubator UI.
-				else {
-					HitIncubator->OpenUI();
+				if (PlayerHandRef->IsInteractableIncubator(HitIncubator)) {
+					HitIncubator->PutCommodity(PlayerHandRef->UseRightHand());
 				}
 			}
-			else {
-				bIsInteractable = false;
+			// If hit target is garbage chute, sell holding object.
+			else if (auto HitGarbageChute = HitActor->FindComponentByClass<UGarbageChute>()) {
+				if (PlayerHandRef->IsInteractableGarbageChute().Key) {
+					HitGarbageChute->SellObject(PlayerHandRef->UseRightHand());
+				}
 			}
 		}
 	}
-	else {
-		bIsHit = false;
+}
+
+// Hide hologram by moving it far away. [LSH]
+void UPlayerInteraction::MoveHologramAway() {
+	if (auto HandObject = PlayerHandRef->GetRightHand()) {
+		if (auto TargetKit = HandObject->FindComponentByClass<UFurnatureKit>()) {
+			TargetKit->SetHologramPosition(FVector(0., -1000., 0.), FRotator::ZeroRotator);
+		}
 	}
 }
 
-
+// Deactivate if there is activated object. [LSH]
+void UPlayerInteraction::Deactivate() {
+	if (DeactivateTarget) {
+		DeactivateTarget->Deactivate();
+		DeactivateTarget = nullptr;
+	}
+}
 

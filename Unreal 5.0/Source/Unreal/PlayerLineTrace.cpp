@@ -36,7 +36,3 @@ FHitResult UPlayerLineTrace::GetHitResult() {
 FRotator UPlayerLineTrace::GetPlayerRotation() {
 	return ActiveLineTrace->GetPlayerRotation();
 }
-
-FHitResult UPlayerLineTrace::ForceLineTraceObject() {
-	return LineTraceObject->GetReach();
-}

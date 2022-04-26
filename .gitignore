@@ -87,7 +87,7 @@ DerivedDataCache/*
 ###########
 */Content/StarterContent
 */Content/Megascans
-*/Content/Resources
+#*/Content/Resources
 
 ##################
 #VS Generated Files#

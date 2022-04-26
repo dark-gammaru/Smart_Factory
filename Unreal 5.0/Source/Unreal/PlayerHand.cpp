@@ -4,6 +4,8 @@
 #include "Commodity.h"
 #include "HoldableObject.h"
 #include "FurnatureKit.h"
+#include "GarbageChute.h"
+#include "PlayerLineTrace.h"
 #include "PlayerInteraction.h"
 
 UPlayerHand::UPlayerHand()
@@ -139,6 +141,34 @@ void UPlayerHand::Swap(float MouseAxis) {
 				}
 			}
 			// TODO : if dust scute
+			else if (auto TargetActor = GetOwner()->FindComponentByClass<UPlayerLineTrace>()->GetHitResult().GetActor()) {
+				if (TargetActor->FindComponentByClass<UGarbageChute>()) {
+					int32 index;
+					if (MouseAxis > 0.9f) {
+						index = (SelectedIndex + 1) % HoldPositions.Num();
+					}
+					else {
+						index = (SelectedIndex + HoldPositions.Num() - 1) % HoldPositions.Num();
+					}
+					for (int32 i = 0; i < HoldingObjectArray.Num(); i++) {
+						if (HoldingObjectArray[index]) {
+							if (auto HoldableObjectRef = HoldingObjectArray[index]->FindComponentByClass<UHoldableObject>()) {
+								SelectedIndex = index;
+								RightHandObject = HoldingObjectArray[index];
+								ReorderObjects();
+								UE_LOG(LogTemp, Warning, TEXT("Swap successed"));
+								return;
+							}
+						}
+						if (MouseAxis > 0.9f) {
+							index = (index + 1) % HoldPositions.Num();
+						}
+						else {
+							index = (index + HoldPositions.Num() - 1) % HoldPositions.Num();
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -232,8 +262,8 @@ AActor* UPlayerHand::UseRightHand() {
 /// </summary>
 /// <param name="TargetIncubator"></param>
 /// <returns></returns>
-bool UPlayerHand::IsInteractable(UIncubator* TargetIncubator) {
-	if (RightHandObject) {
+bool UPlayerHand::IsInteractableIncubator(UIncubator* TargetIncubator) {
+	if (RightHandObject && CurrentIncubator == TargetIncubator) {
 		return true;
 	}
 	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
@@ -249,4 +279,27 @@ bool UPlayerHand::IsInteractable(UIncubator* TargetIncubator) {
 		}
 	}
 	return false;
+}
+
+
+/// <summary>
+/// Check if player is interactable with garbage chute.
+/// And set proper right hand object. [LSH]
+/// </summary>
+/// <returns></returns>
+TTuple<bool, int32> UPlayerHand::IsInteractableGarbageChute() {
+	if (RightHandObject) {
+		return TTuple<bool, int32>(true, RightHandObject->FindComponentByClass<UHoldableObject>()->GetPrice());
+	}
+
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
+		if (HoldingObjectArray[i]) {
+			if (auto HoldableObjectRef = HoldingObjectArray[i]->FindComponentByClass<UHoldableObject>()) {
+				SelectedIndex = i;
+				RightHandObject = HoldingObjectArray[i];
+				return TTuple<bool, int32>(true, RightHandObject->FindComponentByClass<UHoldableObject>()->GetPrice());
+			}
+		}
+	}
+	return TTuple<bool, int32>(false, 0);
 }

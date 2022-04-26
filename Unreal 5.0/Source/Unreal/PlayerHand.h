@@ -32,7 +32,9 @@ public:
 
 	const AActor* GetRightHand();
 
-	bool IsInteractable(UIncubator*);
+	bool IsInteractableIncubator(UIncubator*);
+
+	TTuple<bool, int32> IsInteractableGarbageChute();
 
 	AActor* UseRightHand();
 

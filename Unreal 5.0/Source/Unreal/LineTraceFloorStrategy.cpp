@@ -5,9 +5,6 @@
 
 LineTraceFloorStrategy::LineTraceFloorStrategy(AActor* OwnerRef, UWorld* WorldRef) : LineTraceStrategy(OwnerRef, WorldRef)
 {
-	// Floor traces only with wall and floor
-	FloorTraceObjectParams.AddObjectTypesToQuery(FLOOR_COLLISION_CHANNEL);
-	FloorTraceObjectParams.AddObjectTypesToQuery(WALL_COLLISION_CHANNEL);
 }
 
 /// <summary>
@@ -17,12 +14,21 @@ LineTraceFloorStrategy::LineTraceFloorStrategy(AActor* OwnerRef, UWorld* WorldRe
 FHitResult LineTraceFloorStrategy::GetReach() const {
 	FHitResult Hit;
 	FCollisionQueryParams FloorQueryParams(FName(TEXT("")), false, OwnerRef);
-	WorldRef->LineTraceSingleByObjectType(
+	WorldRef->LineTraceSingleByChannel(
 		OUT Hit,
 		GetPlayerLocation(),
 		GetPlayersReach(ConstructDistance),
-		FloorTraceObjectParams,
+		ECollisionChannel(FurnatureTraceChannel),
 		FloorQueryParams
 	);
+
+	// If target is garbage chute, set distance as object distance.
+	if (auto HitActor = Hit.GetActor()) {
+		if (HitActor->ActorHasTag("GarbageChute")) {
+			if (Hit.Distance > ObjectDistance) {
+				Hit = FHitResult();
+			}
+		}
+	}
 	return Hit;
 }

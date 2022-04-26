@@ -5,9 +5,13 @@
 #include "Components/ActorComponent.h"
 #include "PlayerHand.h"
 #include "PlayerLineTrace.h"
+#include "GarbageChute.h"
+#include "IDeactivator.h"
+#include "SmartFactoryGameInstance.h"
 #include "LineTraceFloorStrategy.h"
 #include "LineTraceObjectStrategy.h"
 #include "PlayerInteraction.generated.h"
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREAL_API UPlayerInteraction : public UActorComponent
@@ -38,9 +42,13 @@ public:
 private:
 	UPlayerHand* PlayerHandRef;
 	UPlayerLineTrace* PlayerLineTraceRef;
+	IDeactivator* DeactivateTarget;
 
 	void Interact();
 	void IsInteractable();
 	void IsConstructable();
+	void MoveHologramAway();
+
+	void Deactivate();
 	
 };

@@ -18,16 +18,8 @@ void UIncubator::BeginPlay()
 	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->CheckTimeDelegate.AddDynamic(this, &UIncubator::CheckTime);
 }
 
-/// <summary>
-/// Test Function to check PlayerInteraction is working properly. [LSH]
-/// </summary>
-/// <param name=""></param>
-void UIncubator::OpenUI(void) {
-	UE_LOG(LogTemp, Warning, TEXT("Open Incubator Successed"));
-}
-
 bool UIncubator::IsInteractable(UCommodity* Item) {
-	if (Item->IsAnimal() == bIsAnimal && Item->GetHabitat() == IncubatorHabitat) {
+	if (Item->IsAnimal() == bIsAnimal && Item->GetHabitat() == IncubatorHabitat && GrowingCommodityRef == nullptr) {
 		return true;
 	}
 	else {
@@ -77,14 +69,6 @@ bool UIncubator::IsAnimal() {
 
 EHabitat UIncubator::GetHabitat() {
 	return IncubatorHabitat;
-}
-
-/// <summary>
-/// Check if incubator is empty. [LSH]
-/// </summary>
-/// <returns>True if incubator is empty.</returns>
-bool UIncubator::IsEmpty() {
-	return GrowingCommodityRef == nullptr;
 }
 
 /// <summary>

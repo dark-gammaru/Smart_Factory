@@ -20,6 +20,7 @@ public:
 	UBlueprintGeneratedClass* FurnatureBP;
 
 	void SpawnHologram();
+	void DestroyHologram();
 	void SetHologramPosition(FVector, FRotator);
 	void SpawnFurnature();
 

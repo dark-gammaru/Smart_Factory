@@ -17,5 +17,6 @@ public:
 
 private:
 	const float ObjectDistance = 170.f;
+	ETraceTypeQuery ObjectTraceChannel = ETraceTypeQuery::TraceTypeQuery2;
 	
 };

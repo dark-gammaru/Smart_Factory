@@ -30,10 +30,6 @@ public:
 	bool IsAnimal();
 	EHabitat GetHabitat();
 
-	bool IsEmpty();
-
-	void OpenUI();
-
 	UFUNCTION(BlueprintCallable)
 	void CheckTime(FDateTime CurrentTime);
 
