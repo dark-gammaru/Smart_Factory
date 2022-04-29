@@ -15,6 +15,6 @@ public:
 
 private:
 	const float ConstructDistance = 500.f;
-	const float ObjectDistance = 170.f;
+	const float ObjectDistance = 200.f;
 	ETraceTypeQuery FurnatureTraceChannel = ETraceTypeQuery::TraceTypeQuery1;
 };
