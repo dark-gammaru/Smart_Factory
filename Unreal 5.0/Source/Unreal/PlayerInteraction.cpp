@@ -4,6 +4,7 @@
 #include "HoldableObject.h"
 #include "FurnatureKit.h"
 #include "GarbageChute.h"
+#include "Bed.h"
 #include "PlayerLineTrace.h"
 #include "Engine/StaticMeshActor.h"
 #include "Incubator.h"
@@ -97,6 +98,10 @@ void UPlayerInteraction::IsInteractable() {
 				Deactivate();
 			}
 		}
+		else if (auto HitBed = HitActor->FindComponentByClass<UBed>()){
+			bIsHit = true;
+			bIsInteractable = true;
+		}
 		else {
 			PlayerHandRef->ResetSwapValues();
 			Deactivate();
@@ -149,6 +154,9 @@ void UPlayerInteraction::Interact() {
 				if (PlayerHandRef->IsInteractableGarbageChute().Key) {
 					HitGarbageChute->SellObject(PlayerHandRef->UseRightHand());
 				}
+			}
+			else if (auto HitBed = HitActor->FindComponentByClass<UBed>()) {
+				HitBed->isClickedOnce = true;
 			}
 		}
 	}
