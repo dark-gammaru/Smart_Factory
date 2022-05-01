@@ -31,8 +31,3 @@ void UBed::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 
 	// ...
 }
-
-bool UBed::IsClickedOnce()
-{
-	return isClickedOnce;
-}

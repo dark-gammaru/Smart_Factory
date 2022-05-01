@@ -156,7 +156,7 @@ void UPlayerInteraction::Interact() {
 				}
 			}
 			else if (auto HitBed = HitActor->FindComponentByClass<UBed>()) {
-				HitBed->isClickedOnce = true;
+				HitBed->isClicked = true;
 			}
 		}
 	}
