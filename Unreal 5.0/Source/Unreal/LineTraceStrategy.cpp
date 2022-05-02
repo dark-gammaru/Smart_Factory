@@ -4,10 +4,8 @@
 #include "LineTraceStrategy.h"
 
 
-LineTraceStrategy::LineTraceStrategy(AActor* OwnerRef, UWorld* WorldRef)
+LineTraceStrategy::LineTraceStrategy(AActor* OwnerRef, UWorld* WorldRef) : OwnerRef(OwnerRef), WorldRef(WorldRef)
 {
-	this->OwnerRef = OwnerRef;
-	this->WorldRef = WorldRef;
 }
 
 /// <summary>

@@ -64,11 +64,13 @@ void UPlayerInteraction::IsConstructable() {
 		else {
 			MoveHologramAway();
 			bIsInteractable = false;
+			Deactivate();
 		}
 	}
 	else {
 		MoveHologramAway();
 		bIsInteractable = false;
+		Deactivate();
 	}
 }
 

@@ -49,6 +49,7 @@ void UGarbageChute::Deactivate() {
 
 // Sell object and destroy it after few seconds. [LSH]
 void UGarbageChute::SellObject(AActor* TargetObject) {
+	TargetObject->FindComponentByClass<UStaticMeshComponent>()->SetCollisionProfileName(TEXT("BlockAll"));
 	TargetObject->AttachToActor(GarbageChuteBase, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	TargetObject->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
 	SmartFactoryGameInstanceRef->CurrencyChange(TargetObject->FindComponentByClass<UHoldableObject>()->GetPrice());
