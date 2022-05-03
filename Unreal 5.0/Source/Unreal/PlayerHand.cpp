@@ -67,6 +67,9 @@ void UPlayerHand::Hold(AActor* Target) {
 	// Disable physics to move object
 	Target->DisableComponentsSimulatePhysics();
 
+	// Make other objects cannot collide with holding object.
+	Target->FindComponentByClass<UStaticMeshComponent>()->SetCollisionProfileName(TEXT("OverlapAll"));
+
 	// Attatch to character's hold position, set location and rotation
 	Target->AttachToActor(PlayerCharacterRef, FAttachmentTransformRules::KeepRelativeTransform);
 	Target->SetActorRelativeLocation(HoldPositions[HoldingObjectCount]->GetRelativeLocation());

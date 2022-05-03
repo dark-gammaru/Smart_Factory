@@ -16,7 +16,7 @@ public:
 	LineTraceObjectStrategy(AActor* OwnerRef, UWorld* WorldRef);
 
 private:
-	const float ObjectDistance = 170.f;
+	const float ObjectDistance = 200.f;
 	ETraceTypeQuery ObjectTraceChannel = ETraceTypeQuery::TraceTypeQuery2;
 	
 };
