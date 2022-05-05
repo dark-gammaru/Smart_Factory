@@ -16,10 +16,10 @@ public:
 	// Sets default values for this component's properties
 	UBed();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isClickedOnce;
+	bool isClicked;
 
-	UFUNCTION(BlueprintCallable)
-	bool IsClickedOnce();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int clickCount;
 
 protected:
 	// Called when the game starts
