@@ -55,12 +55,15 @@ bool UPlayerHand::IsHoldable(UHoldableObject* Target) {
 
 	return true;
 }
+/// <param name="Hit"> : Raycast result, Get target object's information from it. </param>
+
 
 /// <summary>
 /// Pick a target object, set position and rotation to hand. [LSH]
 /// </summary>
-/// <param name="Hit"> : Raycast result, Get target object's information from it. </param>
+/// <param name="Target"> : Selected object's AActor*.</param>
 void UPlayerHand::Hold(AActor* Target) {
+	// Change current weight.
 	int32 ObjectWeight = Target->FindComponentByClass<UHoldableObject>()->GetWeight();
 	CurrentWeight += ObjectWeight;
 
