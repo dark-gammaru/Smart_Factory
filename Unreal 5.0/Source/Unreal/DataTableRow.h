@@ -44,6 +44,22 @@ public:
     int32 Price;
 };
 
+USTRUCT(BlueprintType)
+struct FCommodityRow : public FHoldableObjectRow
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString ScientificName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FString Information;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool bIsAnimal;
+};
+
 UCLASS()
 class UNREAL_API ADataTableRow : public AActor
 {

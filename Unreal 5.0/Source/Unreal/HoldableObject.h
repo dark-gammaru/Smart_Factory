@@ -25,6 +25,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetPrice();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsHoldable();
+
+	UFUNCTION(BlueprintCallable)
+	void MakeUnholdable();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	FString Name;
@@ -34,4 +40,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	int32 Weight;
+
+	bool bIsHoldable = true;
 };

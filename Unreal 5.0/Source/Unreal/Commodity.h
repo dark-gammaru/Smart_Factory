@@ -22,12 +22,6 @@ public:
 	
 private:
 	UPROPERTY(EditAnywhere)
-	FString ScientificName;
-
-	UPROPERTY(EditAnywhere)
-	FString Information;
-
-	UPROPERTY(EditAnywhere)
 	int32 GrowthTime;
 
 	UPROPERTY(EditAnywhere)

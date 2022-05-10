@@ -8,8 +8,8 @@
 #include "Engine/DataTable.h"
 #include "HoldableObject.h"
 #include "HoldableObjectEnum.h"
+#include "Misc/OutputDeviceNull.h"
 #include "Incubator.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UNREAL_API UIncubator : public UActorComponent
@@ -33,10 +33,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CheckTime(FDateTime CurrentTime);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UDataTable* CommodityTable;
+	UFUNCTION(BlueprintCallable)
+	void Manufacture();
+
+	UPROPERTY(BlueprintReadWrite)
+	class UDataTable* ProductTable;
 
 	bool IsInteractable(UCommodity*);
+
+	// Send Korean name to blueprint
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString CommodityName;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -56,5 +63,5 @@ private:
 
 	void SetPosition(AActor*);
 
-	void Manufacture();
+
 };

@@ -29,23 +29,39 @@ bool UIncubator::IsInteractable(UCommodity* Item) {
 
 /// <summary>
 /// Start growing commodity. Set parent, position of commodity and save growing time. [LSH]
+/// Call CloseDoor on blueprint, 
 /// </summary>
 /// <param name="CommodityRef"> : Reference of Commodity</param>
 void UIncubator::PutCommodity(AActor* CommodityRef) {
 	GrowingCommodityRef = CommodityRef->FindComponentByClass<UCommodity>();
+
+	// Save commodity name for blueprint.
+	CommodityName = GrowingCommodityRef->GetName();
 	
+	// Preventing player hold a commodity that has been already put.
+	GrowingCommodityRef->MakeUnholdable();
+
+	// Call CloseDoor on blueprint
+	FOutputDeviceNull device;
+	FString DoorEventString = TEXT("CloseDoor");
+	GetOwner()->CallFunctionByNameWithArguments(*DoorEventString, device, NULL, true);
+
+	// Call SendCommodityInfo on blueprint
+	char FuncCallBuf[256];
+	FString CommodityEventString = TEXT("SendCommodityInfo");
+	_snprintf(FuncCallBuf, sizeof(FuncCallBuf), "%s %d", TCHAR_TO_ANSI(*CommodityEventString),
+		GrowingCommodityRef->GetGrowthTime());
+
+	GetOwner()->CallFunctionByNameWithArguments(ANSI_TO_TCHAR(FuncCallBuf), device, NULL, true);
+
 	SetPosition(CommodityRef);
 
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
-	ResultRow = CommodityTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
+	ResultRow = ProductTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
 
 	if (ResultRow == nullptr) {
 		UE_LOG(LogTemp, Warning, TEXT("Table Error"));
-		return;
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Success"));
 	}
 }
 
@@ -58,6 +74,7 @@ void UIncubator::Manufacture() {
 	AActor* Product = Cast<AActor>(GetWorld()->SpawnActor(ResultRow->Product));
 	Product->DisableComponentsSimulatePhysics();
 	SetPosition(Product);
+	Product->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
 	Product->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	ResultRow = nullptr;
 }
@@ -77,10 +94,7 @@ EHabitat UIncubator::GetHabitat() {
 /// <param name="CurrentTime"> : Current time from GameInstance.</param>
 void UIncubator::CheckTime(FDateTime CurrentTime) {
 	if (GrowingCommodityRef) {
-		if (CalculateProgress(CurrentTime) >= 120.f) {
-			Manufacture();
-		}
-		else if (CalculateProgress(CurrentTime) >= 100.f) {
+		if (CalculateProgress(CurrentTime) >= 100.f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->FinalModel);
 		}
 		else if (CalculateProgress(CurrentTime) >= 50.f) {
@@ -105,16 +119,16 @@ float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 
 
 /// <summary>
-/// Set relative position of actor to center of incubator.
+/// Set relative position of actor to center of incubator. [LSH]
 /// </summary>
 /// <param name="TargetActor">Actor to move position.</param>
 void UIncubator::SetPosition(AActor* TargetActor) {
 	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
-	if (!bIsAnimal) {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 0.f, 160.f));
+	if (bIsAnimal) {
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 57.f));
 	}
 	else {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 0.f, 200.f));
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));
 	}
 	TargetActor->SetActorRelativeRotation(FQuat::Identity);
 }

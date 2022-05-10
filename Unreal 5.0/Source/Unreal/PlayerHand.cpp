@@ -53,6 +53,10 @@ bool UPlayerHand::IsHoldable(UHoldableObject* Target) {
 		return false;
 	}
 
+	if (!Target->IsHoldable()) {
+		return false;
+	}
+
 	return true;
 }
 /// <param name="Hit"> : Raycast result, Get target object's information from it. </param>
