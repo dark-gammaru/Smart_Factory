@@ -131,4 +131,5 @@ void UIncubator::SetPosition(AActor* TargetActor) {
 		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));
 	}
 	TargetActor->SetActorRelativeRotation(FQuat::Identity);
+	TargetActor->SetActorRelativeScale3D(FVector::OneVector);
 }

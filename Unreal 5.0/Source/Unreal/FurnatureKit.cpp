@@ -24,7 +24,7 @@ void UFurnatureKit::SetHologramPosition(FVector HitLocation, FRotator Rotator) {
 	if (HologramFurnature) {
 		// You must disable physics in order to change actor's location.
 		HologramFurnature->DisableComponentsSimulatePhysics();
-		HologramFurnature->SetActorLocationAndRotation(HitLocation, FRotator(0., Rotator.Yaw + 180., 0.), false, nullptr, ETeleportType::TeleportPhysics);
+		HologramFurnature->SetActorLocationAndRotation(HitLocation + FVector(0, 0, 1), FRotator(0., Rotator.Yaw + 180., 0.), false, nullptr, ETeleportType::TeleportPhysics);
 		HologramFurnature->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
 	}
 }

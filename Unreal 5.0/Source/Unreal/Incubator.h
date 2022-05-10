@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Manufacture();
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* ProductTable;
 
 	bool IsInteractable(UCommodity*);
