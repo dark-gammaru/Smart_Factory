@@ -13,22 +13,62 @@ UWallManager::UWallManager()
 	// ...
 }
 
+void UWallManager::CheckDonation() {
+	//Character Watch Wall
+	//DEBUG
+	DonationWin();
+}
 
-// Called when the game starts
-void UWallManager::BeginPlay()
-{
-	Super::BeginPlay();
+void UWallManager::Donate(int32 Amount, int32 MaxAmount) {
 
-	// ...
-	
+}
+
+void UWallManager::DonationWin() {
+	UE_LOG(LogTemp, Warning, TEXT("Win"));
+	TArray<AActor*> Walls;
+	TArray<AActor*> Walls2;
+	WallPhaseHolders[CurrentPhase]->GetAttachedActors(Walls);
+	if (CurrentLife == 4) {
+		//Kill and Next Phase
+		++CurrentPhase;
+		CurrentLife = 2;
+	}
+	else {
+//		MoveWallVertical(Walls, CurrentLife + 1, CurrentLife);
+		UE_LOG(LogTemp, Warning, TEXT("Name %s"), *Walls[0]->GetName());
+		Walls[0]->GetAttachedActors(Walls2, true, true);
+		UE_LOG(LogTemp, Warning, TEXT("Inside22 %d"), Walls2.Num());
+		++CurrentLife;
+	}
+
+
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"), Walls2.Num());
 }
 
 
-// Called every frame
-void UWallManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+void UWallManager::DonationLose() {
+	UE_LOG(LogTemp, Warning, TEXT("Lose"));
+	TArray<AActor*> Walls;
+	WallPhaseHolders[CurrentPhase]->GetAttachedActors(Walls);
+	if (CurrentLife == 0) {
+		//Die
+	}
+	else {
+		//Next
+		MoveWallVertical(Walls, CurrentLife - 1, CurrentLife);
+		--CurrentLife;
+	}
 
-	// ...
 }
 
+void UWallManager::MoveWallVertical(const TArray<AActor*> &TargetWallArray, int32 DownTargetIndex, int32 UpTargetIndex) {
+	TArray<AActor*> Walls;
+	TargetWallArray[UpTargetIndex]->GetAttachedActors(Walls);
+	UE_LOG(LogTemp, Warning, TEXT("Inside %d"), Walls.Num());
+	for(AActor * Wall : Walls)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Wall->GetName());
+		Wall->FindComponentByClass<UStaticMeshComponent>()->AddForce(FVector(0, 0, 10000.f));
+	}
+}
