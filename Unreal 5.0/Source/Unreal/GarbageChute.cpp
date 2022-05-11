@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "GarbageChute.h"
 #include "Kismet/GameplayStatics.h"
 #include "HoldableObject.h"
 #include "Components/PrimitiveComponent.h"
-#include "GarbageChute.h"
 
 UGarbageChute::UGarbageChute()
 {

@@ -22,7 +22,7 @@ public:
 	FDateTime GameTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Currency = 400;
+	int32 Currency = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsNight;
