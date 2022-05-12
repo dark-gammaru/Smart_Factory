@@ -16,7 +16,7 @@ public:
 	// Sets default values for this component's properties
 	UBed();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isClicked;
+	bool isClickedOnce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int clickCount;
