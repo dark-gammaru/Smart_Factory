@@ -34,33 +34,25 @@ bool UIncubator::IsInteractable(UCommodity* Item) {
 /// <param name="CommodityRef"> : Reference of Commodity</param>
 void UIncubator::PutCommodity(AActor* CommodityRef) {
 	GrowingCommodityRef = CommodityRef->FindComponentByClass<UCommodity>();
-
-	// Save commodity name for blueprint.
-	CommodityName = GrowingCommodityRef->GetName();
 	
 	// Preventing player hold a commodity that has been already put.
 	GrowingCommodityRef->MakeUnholdable();
 
+	// Attach commodity to incubator and reposition it.
+	SetPosition(CommodityRef);
+
 	// Call CloseDoor on blueprint
 	FOutputDeviceNull device;
-	FString DoorEventString = TEXT("CloseDoor");
+	FString DoorEventString = TEXT("PutCommodity");
 	GetOwner()->CallFunctionByNameWithArguments(*DoorEventString, device, NULL, true);
-
-	// Call SendCommodityInfo on blueprint
-	char FuncCallBuf[256];
-	FString CommodityEventString = TEXT("SendCommodityInfo");
-	_snprintf(FuncCallBuf, sizeof(FuncCallBuf), "%s %d", TCHAR_TO_ANSI(*CommodityEventString),
-		GrowingCommodityRef->GetGrowthTime());
-
-	GetOwner()->CallFunctionByNameWithArguments(ANSI_TO_TCHAR(FuncCallBuf), device, NULL, true);
-
-	SetPosition(CommodityRef);
 
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
+
+	check(ProductTable != nullptr);
 	ResultRow = ProductTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
 
-	if (ResultRow == nullptr) {
+	if (ensure(ResultRow != nullptr)) {
 		UE_LOG(LogTemp, Warning, TEXT("Table Error"));
 	}
 }
@@ -125,7 +117,7 @@ float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 void UIncubator::SetPosition(AActor* TargetActor) {
 	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
 	if (bIsAnimal) {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 57.f));
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 75.f));
 	}
 	else {
 		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));

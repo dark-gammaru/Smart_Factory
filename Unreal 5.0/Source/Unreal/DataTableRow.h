@@ -26,6 +26,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         UStaticMesh* FinalModel;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        UStaticMesh* OldModel;
 };
 
 USTRUCT(BlueprintType)

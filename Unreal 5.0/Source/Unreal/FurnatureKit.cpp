@@ -41,10 +41,7 @@ void UFurnatureKit::SpawnFurnature() {
 	DestroyHologram();
 
 	// Spawn new furnature and set location and rotation.
-	AActor* SpawnedFurnature = GetWorld()->SpawnActor(FurnatureBP);
-	SpawnedFurnature->GetRootComponent()->SetMobility(EComponentMobility::Movable);
-	SpawnedFurnature->SetActorLocationAndRotation(FurnatureLocation, FurnatureRotation);
-	SpawnedFurnature->GetRootComponent()->SetMobility(EComponentMobility::Static);
+	AActor* SpawnedFurnature = GetWorld()->SpawnActor(FurnatureBP, &FurnatureLocation, &FurnatureRotation);
 
 	// Destroy furnature kit.
 	GetOwner()->Destroy();

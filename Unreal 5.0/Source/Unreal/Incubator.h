@@ -41,10 +41,6 @@ public:
 
 	bool IsInteractable(UCommodity*);
 
-	// Send Korean name to blueprint
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FString CommodityName;
-
 private:
 	UPROPERTY(EditAnywhere)
 	EHabitat IncubatorHabitat;
