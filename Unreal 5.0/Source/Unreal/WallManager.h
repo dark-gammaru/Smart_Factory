@@ -19,7 +19,7 @@ public:
 	TArray<AActor*> WallPhaseHolders;
 
 	UFUNCTION(BlueprintCallable)
-	void CheckDonation();
+	void CheckDonation(bool testWin);
 
 	UFUNCTION(BlueprintCallable)
 	void Donate(int32 Amount, int32 MaxAmount);
@@ -28,11 +28,15 @@ private:
 	void DonationWin();
 	void DonationLose();
 
-	void MoveWallVertical(const TArray<AActor*> &TargetWallArray, int32 DownTargetIndex, int32 UpTargetIndex);
+	void MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex);
 
 	int32 CurrentPhase = 0;
 	int32 CurrentLife = 2;
 
 	const float FloorHeight = 200.f;
 	const float CeilingHeight = 550.f;
+
+	float alpha = 0.f;
+	FTimerHandle UpWaitHandle;
+	FTimerHandle DownWaitHandle;
 };

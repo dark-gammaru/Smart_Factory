@@ -19,6 +19,9 @@ class UNREAL_API USmartFactoryGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* Manager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDateTime GameTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
