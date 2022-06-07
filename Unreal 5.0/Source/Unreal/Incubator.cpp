@@ -1,6 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Incubator.h"
+#include "Components/WidgetComponent.h"
+#include "Components/LightComponent.h"
 #include "SmartFactoryGameInstance.h"
 
 // Sets default values for this component's properties
@@ -124,4 +126,17 @@ void UIncubator::SetPosition(AActor* TargetActor) {
 	}
 	TargetActor->SetActorRelativeRotation(FQuat::Identity);
 	TargetActor->SetActorRelativeScale3D(FVector::OneVector);
+}
+
+void UIncubator::MakeDestructable() {
+	// If growing something, then destroy it.
+	if (GrowingCommodityRef) {
+		GrowingCommodityRef->GetOwner()->Destroy();
+		GrowingCommodityRef = nullptr;
+	}
+
+	// Unregister Time delegate
+	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->CheckTimeDelegate.Remove(this, FName("CheckTime"));
+
+	Super::MakeDestructable();
 }

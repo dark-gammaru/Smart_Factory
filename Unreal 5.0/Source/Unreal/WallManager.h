@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ChaosDestructionTriggerVolume.h"
 #include "Components/SceneComponent.h"
 #include "WallManager.generated.h"
 
@@ -24,11 +25,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Donate(int32 Amount, int32 MaxAmount);
 
+	UPROPERTY(EditAnywhere)
+	AChaosDestructionTriggerVolume* ChaosVolume;
+
+
 private:
 	void DonationWin();
 	void DonationLose();
 
 	void MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex);
+	void MoveWallHorizontal(int32 Phase, int32 Life);
 
 	int32 CurrentPhase = 0;
 	int32 CurrentLife = 2;
@@ -36,7 +42,6 @@ private:
 	const float FloorHeight = 200.f;
 	const float CeilingHeight = 550.f;
 
-	float alpha = 0.f;
-	FTimerHandle UpWaitHandle;
-	FTimerHandle DownWaitHandle;
+	TArray<float> HorizontalWinLocation{ 1355.0f, 1655.0f, 2900.0f };
+	TArray<float> HorizontalLoseLocation{ 60.f, 100.f, 180.f };
 };

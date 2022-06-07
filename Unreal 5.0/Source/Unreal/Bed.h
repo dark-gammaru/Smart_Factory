@@ -1,33 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "ChaosDestructable.h"
 #include "Bed.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UNREAL_API UBed : public UActorComponent
+class UNREAL_API UBed : public UChaosDestructable
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	UBed();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isClickedOnce;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int clickCount;
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	int clickCount;		
 };

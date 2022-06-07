@@ -10,5 +10,7 @@ public class UnrealEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("Unreal");
+		bCompileChaos = true;
+		bUseChaos = true;
 	}
 }

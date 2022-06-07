@@ -9,10 +9,11 @@
 #include "HoldableObject.h"
 #include "HoldableObjectEnum.h"
 #include "Misc/OutputDeviceNull.h"
+#include "ChaosDestructable.h"
 #include "Incubator.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UNREAL_API UIncubator : public UActorComponent
+class UNREAL_API UIncubator : public UChaosDestructable
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,11 @@ public:
 
 	bool IsInteractable(UCommodity*);
 
+#pragma region Destructable
+	void MakeDestructable() override;
+
+#pragma endregion
+
 private:
 	UPROPERTY(EditAnywhere)
 	EHabitat IncubatorHabitat;
@@ -58,6 +64,5 @@ private:
 	float CalculateProgress(FDateTime CurrentTime);
 
 	void SetPosition(AActor*);
-
 
 };
