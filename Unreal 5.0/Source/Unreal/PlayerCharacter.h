@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCameraComponent* PlayerCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Movable = true;
+
 
 private:
 	void MoveForward(float AxisValue);

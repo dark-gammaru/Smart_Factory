@@ -35,15 +35,21 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 }
 
 void APlayerCharacter::MoveForward(float AxisValue) {
-	AddMovementInput(GetActorForwardVector() * AxisValue * Speed);
+	if (Movable) {
+		AddMovementInput(GetActorForwardVector() * AxisValue * Speed);
+	}
 }
 
 void APlayerCharacter::MoveRight(float AxisValue) {
-	AddMovementInput(GetActorRightVector() * AxisValue * Speed);
+	if (Movable) {
+		AddMovementInput(GetActorRightVector() * AxisValue * Speed);
+	}
 }
 
 void APlayerCharacter::StartCrouch() {
-	Crouch();
+	if (Movable) {
+		Crouch();
+	}
 }
 
 void APlayerCharacter::EndCrouch() {

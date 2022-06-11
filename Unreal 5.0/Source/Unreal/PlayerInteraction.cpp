@@ -84,8 +84,8 @@ void UPlayerInteraction::IsInteractable() {
 			bIsInteractable = PlayerHandRef->IsHoldable(HitHoldableObject);
 		}
 		else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
-			bIsHit = true;
 			bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
+			bIsHit = bIsInteractable;
 		}
 		else if (auto HitGarbageChute = HitActor->FindComponentByClass<UGarbageChute>()) {
 			bIsHit = true;

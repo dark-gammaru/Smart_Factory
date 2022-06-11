@@ -18,11 +18,9 @@ class UNREAL_API UIncubator : public UChaosDestructable
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UIncubator();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	

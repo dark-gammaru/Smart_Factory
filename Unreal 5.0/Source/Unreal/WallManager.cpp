@@ -2,7 +2,9 @@
 
 
 #include "WallManager.h"
-#include "TimerManager.h" 
+#include "TimerManager.h"
+#include "DonationManager.h"
+#include "SmartFactoryGameInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values for this component's properties
@@ -11,19 +13,22 @@ UWallManager::UWallManager()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UWallManager::CheckDonation(bool testWin) {
-	//Character Watch Wall
-	//DEBUG
-	if (testWin) {
-		DonationWin();
+void UWallManager::CheckDonation() {
+	if (DayCount == DonationDay) {
+		float rnd = FMath::FRand();
+		GetOwner()->FindComponentByClass<UDonationManager>()->ResetDistribution();
+		if (rnd <= GetOwner()->FindComponentByClass<UDonationManager>()->GetDistribution()) {
+			DonationWin();
+		}
+		else {
+			DonationLose();
+		}
+		DayCount = 0;
 	}
 	else {
-		DonationLose();
+		DayCount++;
+		CallMorningDelegate();
 	}
-}
-
-void UWallManager::Donate(int32 Amount, int32 MaxAmount) {
-
 }
 
 void UWallManager::DonationWin() {
@@ -32,6 +37,7 @@ void UWallManager::DonationWin() {
 		//Kill and Next Phase
 		MoveWallHorizontal(CurrentPhase, CurrentLife);
 		++CurrentPhase;
+		GetOwner()->FindComponentByClass<UDonationManager>()->CurrentPhase++;
 		ChaosVolume->ChangeSize(CurrentPhase);
 		CurrentLife = 2;
 	}
@@ -126,6 +132,7 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 				GetWorld()->GetTimerManager().ClearTimer(UpWaitHandle);
 				upAlpha = 0.f;
 				UE_LOG(LogTemp, Warning, TEXT("MoveEnded"));
+				CallMorningDelegate();
 			}
 		}), CallDelay, true, 2.f);  // Wait 2 seconds
 }
@@ -197,11 +204,13 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 					}
 					TargetHolder->Destroy();
 					// TODO : CPU death Effect.
+					CallMorningDelegate();
 				}
 			}
 			else {
 				GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
 				UE_LOG(LogTemp, Error, TEXT("Horizontal Wall error : No holder"));
+				CallMorningDelegate();
 			}
 			}), 0.02f, true);
 	}
@@ -220,7 +229,12 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 			else {
 				GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
 				UE_LOG(LogTemp, Error, TEXT("Horizontal Wall error : No holder"));
+				CallMorningDelegate();
 			}
 			}), 0.02f, true);
 	}
+}
+
+void UWallManager::CallMorningDelegate() {
+	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->MorningDelegate.Broadcast();
 }

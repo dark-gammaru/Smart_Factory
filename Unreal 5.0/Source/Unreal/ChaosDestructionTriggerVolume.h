@@ -27,5 +27,5 @@ private:
 	void OnOverlapEnd(class AActor* OverlappedActor, class AActor* OtherActor);
 
 	TArray<UChaosDestructable*> DestructionTargets;
-	TArray<FVector> PhaseSize{ FVector(1.f, 50.f, 4.f), FVector(50.f, 1.f, 4.f) , FVector(1.f, 50.f, 4.f) };
+	TArray<FVector> PhaseSize{ FVector(1.f, 50.f, 4.f), FVector(50.f, 1.f, 4.f) , FVector(2.f, 50.f, 4.f) };
 };

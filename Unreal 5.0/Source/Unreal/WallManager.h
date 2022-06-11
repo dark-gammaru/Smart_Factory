@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "ChaosDestructionTriggerVolume.h"
-#include "Components/SceneComponent.h"
+#include "Components/ActorComponent.h"
 #include "WallManager.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UNREAL_API UWallManager : public USceneComponent
+class UNREAL_API UWallManager : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -20,14 +20,10 @@ public:
 	TArray<AActor*> WallPhaseHolders;
 
 	UFUNCTION(BlueprintCallable)
-	void CheckDonation(bool testWin);
-
-	UFUNCTION(BlueprintCallable)
-	void Donate(int32 Amount, int32 MaxAmount);
+	void CheckDonation();
 
 	UPROPERTY(EditAnywhere)
-	AChaosDestructionTriggerVolume* ChaosVolume;
-
+	AChaosDestructionTriggerVolume* ChaosVolume = nullptr;
 
 private:
 	void DonationWin();
@@ -44,4 +40,9 @@ private:
 
 	TArray<float> HorizontalWinLocation{ 1355.0f, 1655.0f, 2900.0f };
 	TArray<float> HorizontalLoseLocation{ 60.f, 100.f, 180.f };
+
+	int32 DayCount = 0;
+	const int32 DonationDay = 1;
+
+	void CallMorningDelegate();
 };
