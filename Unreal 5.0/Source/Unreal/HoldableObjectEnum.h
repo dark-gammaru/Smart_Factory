@@ -16,6 +16,7 @@ enum class EHabitat : uint8 {
 	Plain = 0 UMETA(DisplayName = "Plain"),
 	Desert = 1 UMETA(DisplayName = "Desert"),
 	Ocean = 2 UMETA(DisplayName = "Ocean"),
+	Void = 3 UMETA(DisplayName = "Void"),
 };
 
 UENUM(BlueprintType)

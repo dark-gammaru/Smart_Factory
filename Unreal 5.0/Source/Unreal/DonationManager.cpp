@@ -1,5 +1,5 @@
-#include "SmartFactoryGameInstance.h"
 #include "DonationManager.h"
+#include "SmartFactoryGameInstance.h"
 
 float UDonationManager::CumulativeDistribution() {
 	if (CurrentDonation == 0) {

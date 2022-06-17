@@ -10,7 +10,7 @@ class UNREAL_API UChaosDestructable : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void MakeDestructable();
 
 protected:

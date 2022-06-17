@@ -16,13 +16,13 @@ UWallManager::UWallManager()
 void UWallManager::CheckDonation() {
 	if (DayCount == DonationDay) {
 		float rnd = FMath::FRand();
-		GetOwner()->FindComponentByClass<UDonationManager>()->ResetDistribution();
 		if (rnd <= GetOwner()->FindComponentByClass<UDonationManager>()->GetDistribution()) {
 			DonationWin();
 		}
 		else {
 			DonationLose();
 		}
+		GetOwner()->FindComponentByClass<UDonationManager>()->ResetDistribution();
 		DayCount = 0;
 	}
 	else {

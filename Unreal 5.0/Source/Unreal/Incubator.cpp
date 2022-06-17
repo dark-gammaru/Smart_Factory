@@ -73,6 +73,14 @@ void UIncubator::Manufacture() {
 	ResultRow = nullptr;
 }
 
+void UIncubator::AbortCommodity() {
+	if (GrowingCommodityRef) {
+		GrowingCommodityRef->GetOwner()->Destroy();
+	}	
+	GrowingCommodityRef = nullptr;
+	ResultRow = nullptr;
+}
+
 
 bool UIncubator::IsAnimal() {
 	return bIsAnimal;
@@ -82,19 +90,24 @@ EHabitat UIncubator::GetHabitat() {
 	return IncubatorHabitat;
 }
 
+void UIncubator::SetHabitat(EHabitat Habitat) {
+	IncubatorHabitat = Habitat;
+}
+
 /// <summary>
 /// Check time and change progress. Registered to CheckTimeDelegate, called every 5 seconds. [LSH]
 /// </summary>
 /// <param name="CurrentTime"> : Current time from GameInstance.</param>
 void UIncubator::CheckTime(FDateTime CurrentTime) {
 	if (GrowingCommodityRef) {
-		if (CalculateProgress(CurrentTime) >= 100.f) {
+		Progress = CalculateProgress(CurrentTime);
+		if (Progress >= 1.f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->FinalModel);
 		}
-		else if (CalculateProgress(CurrentTime) >= 50.f) {
+		else if (Progress >= 0.5f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->MiddleModel);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), CalculateProgress(CurrentTime));
+		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), Progress);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Empty Incubator %s : Working"), *GetOwner()->GetName());
@@ -108,7 +121,7 @@ void UIncubator::CheckTime(FDateTime CurrentTime) {
 /// <returns>Float percentage of growing progress.</returns>
 float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 	FTimespan Timespan = CurrentTime - StartGrowingTime;
-	return (float)(Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration * 100;
+	return (float)(Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration;
 }
 
 

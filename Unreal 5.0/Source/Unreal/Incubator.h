@@ -26,8 +26,13 @@ protected:
 public:	
 	void PutCommodity(AActor*);
 	
+	UFUNCTION(BlueprintCallable)
 	bool IsAnimal();
+
 	EHabitat GetHabitat();
+
+	UFUNCTION(BlueprintCallable)
+	void SetHabitat(EHabitat Habitat);
 
 	UFUNCTION(BlueprintCallable)
 	void CheckTime(FDateTime CurrentTime);
@@ -35,15 +40,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Manufacture();
 
+	UFUNCTION(BlueprintCallable)
+	void AbortCommodity();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* ProductTable;
 
 	bool IsInteractable(UCommodity*);
-
-#pragma region Destructable
+	
 	void MakeDestructable() override;
 
-#pragma endregion
+	UPROPERTY(BlueprintReadOnly)
+	float Progress = 0.f;
+
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -52,7 +61,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bIsAnimal;
 
+	UPROPERTY()
 	UCommodity* GrowingCommodityRef;
+
 	int32 CommodityGrowthDuration;
 
 	FProductRow* ResultRow;

@@ -60,6 +60,9 @@ public:
     FString Information;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 GrowthTime;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool bIsAnimal;
 };
 

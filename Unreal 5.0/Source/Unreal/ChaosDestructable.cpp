@@ -33,5 +33,5 @@ void UChaosDestructable::Destruction(FVector Location, FRotator Rotation) {
 	GetWorld()->GetTimerManager().SetTimer(DestructionDelayHandle, FTimerDelegate::CreateLambda([=]() {
 		GeometryCollection->Destroy();
 		GetOwner()->Destroy();
-		}), 1.f, false, 5.f);
+		}), 1.f, false, 7.f);
 }
