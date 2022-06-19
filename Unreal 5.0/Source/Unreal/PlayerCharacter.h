@@ -32,7 +32,9 @@ public:
 
 
 private:
+	UFUNCTION(BlueprintCallable)
 	void MoveForward(float AxisValue);
+	UFUNCTION(BlueprintCallable)
 	void MoveRight(float AxisValue);
 
 	void StartCrouch();
