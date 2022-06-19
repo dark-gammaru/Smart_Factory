@@ -15,6 +15,10 @@ class UNREAL_API UProduct : public UHoldableObject
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
+
+private:
 	UPROPERTY(EditAnywhere)
 	bool bIsBadQuality;
 

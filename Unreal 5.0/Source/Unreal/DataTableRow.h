@@ -66,6 +66,24 @@ public:
     bool bIsAnimal;
 };
 
+USTRUCT(Atomic, BlueprintType)
+struct FMarketProductRow : public FTableRowBase
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        FString ProductName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        FString Information;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        UTexture2D* Image;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        int32 Price;
+};
 UCLASS()
 class UNREAL_API ADataTableRow : public AActor
 {

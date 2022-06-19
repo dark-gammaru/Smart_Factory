@@ -17,9 +17,6 @@ class UNREAL_API UIncubator : public UChaosDestructable
 {
 	GENERATED_BODY()
 
-public:	
-	UIncubator();
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,9 +39,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AbortCommodity();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UDataTable* ProductTable;
 
 	bool IsInteractable(UCommodity*);
 	

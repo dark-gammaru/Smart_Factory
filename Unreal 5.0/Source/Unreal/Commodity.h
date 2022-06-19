@@ -19,12 +19,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetGrowthTime();
-	
+
+protected:
+	virtual void BeginPlay() override;
+
 private:
-	UPROPERTY(EditAnywhere)
 	int32 GrowthTime;
 
-	UPROPERTY(EditAnywhere)
 	bool bIsAnimal;
 
 	UPROPERTY(EditAnywhere)

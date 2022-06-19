@@ -16,7 +16,6 @@ class UNREAL_API USmartFactoryGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* Manager;
@@ -35,6 +34,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CurrencyChange(int32 Amount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* CommodityTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* StaticMeshTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* MarketProductTable;
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
 	FCheckTimeDelegate CheckTimeDelegate;

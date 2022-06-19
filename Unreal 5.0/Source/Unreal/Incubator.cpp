@@ -5,12 +5,6 @@
 #include "Components/LightComponent.h"
 #include "SmartFactoryGameInstance.h"
 
-// Sets default values for this component's properties
-UIncubator::UIncubator()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-}
-
 // Called when the game starts
 void UIncubator::BeginPlay()
 {
@@ -51,8 +45,7 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();
 
-	check(ProductTable != nullptr);
-	ResultRow = ProductTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
+	ResultRow = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->StaticMeshTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
 
 	if (ensure(ResultRow != nullptr)) {
 		UE_LOG(LogTemp, Warning, TEXT("Table Error"));

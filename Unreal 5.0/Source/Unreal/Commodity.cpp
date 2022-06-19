@@ -2,6 +2,16 @@
 
 
 #include "Commodity.h"
+#include "SmartFactoryGameInstance.h"
+#include "DataTableRow.h"
+
+void UCommodity::BeginPlay() {
+	Super::BeginPlay();
+	auto ResultRow = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->CommodityTable->FindRow<FCommodityRow>(*GetName(), "");
+	Price = ResultRow->Price;
+	GrowthTime = ResultRow->GrowthTime;
+	bIsAnimal = ResultRow->bIsAnimal;
+}
 
 /// <summary>
 /// Get bIsAnimal of commodity. [LSH]

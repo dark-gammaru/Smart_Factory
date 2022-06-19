@@ -13,10 +13,6 @@ class UNREAL_API UHoldableObject : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	UHoldableObject();
-
-public:	
 	int32 GetWeight(void);
 
 	UFUNCTION(BlueprintCallable)
@@ -35,11 +31,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FString Name;
 
-	UPROPERTY(EditAnywhere)
 	int32 Price;
 
 	UPROPERTY(EditAnywhere)
-	int32 Weight;
+	int32 Weight = 1;
 
 	bool bIsHoldable = true;
 };
