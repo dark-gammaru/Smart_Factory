@@ -5,7 +5,6 @@
 #include "TimerManager.h"
 #include "DonationManager.h"
 #include "SmartFactoryGameInstance.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -79,12 +78,13 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 	AActor* UpHolder = nullptr;
 	AActor* DownHolder = nullptr;
 	for (AActor* holder : TargetWallArray) {
-		if (UKismetSystemLibrary::GetDisplayName(holder)[7] - '1' == DownTargetIndex) {
+		if (holder->ActorHasTag(FName(FString::Printf(TEXT("WALL%d"), DownTargetIndex)))) {
 			DownHolder = holder;
 		}
-		else if (UKismetSystemLibrary::GetDisplayName(holder)[7] - '1' == UpTargetIndex) {
+		else if (holder->ActorHasTag(FName(FString::Printf(TEXT("WALL%d"), UpTargetIndex)))) {
 			UpHolder = holder;
 		}
+
 	}
 
 	if (UpHolder == nullptr) {
@@ -100,7 +100,6 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 	// Move wall down
 	FVector OriginalLocation = DownHolder->GetActorLocation();
 	FVector MovedLocation = OriginalLocation + FVector(0, 0, -350.f);
-
 	ChaosVolume->SetActorLocation(MovedLocation);
 
 	float CallDelay = 0.01f;  // Call lambda function every 0.01 second.
@@ -158,7 +157,7 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 
 	AActor* TargetHolder = nullptr;
 	for (AActor* holder : TargetWallArray) {
-		if (UKismetSystemLibrary::GetDisplayName(holder)[7] - '0' == Life + 1) {
+		if (holder->ActorHasTag(FName(FString::Printf(TEXT("WALL%d"), Life)))) {
 			TargetHolder = holder;
 			break;
 		}
@@ -179,7 +178,7 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 		if (isWin) { // Win, X Axis
 			MovedLocation = FVector(HorizontalWinLocation[Phase], OriginalLocation.Y, OriginalLocation.Z);
 		}
-		else{ // Lose, X Axis
+		else { // Lose, X Axis
 			MovedLocation = FVector(HorizontalLoseLocation[Phase], OriginalLocation.Y, OriginalLocation.Z);
 		}
 	}
