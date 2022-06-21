@@ -3,6 +3,7 @@
 #include "GarbageChute.h"
 #include "Kismet/GameplayStatics.h"
 #include "HoldableObject.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/PrimitiveComponent.h"
 
 UGarbageChute::UGarbageChute()
@@ -54,6 +55,7 @@ void UGarbageChute::SellObject(AActor* TargetObject) {
 	TargetObject->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
 	SmartFactoryGameInstanceRef->CurrencyChange(TargetObject->FindComponentByClass<UHoldableObject>()->GetPrice());
 
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), MoneyCue, GetOwner()->GetActorLocation(), FRotator::ZeroRotator);
 
 	FTimerHandle TimerHandle;
 	FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UGarbageChute::DestroyHoldableObject, TargetObject);

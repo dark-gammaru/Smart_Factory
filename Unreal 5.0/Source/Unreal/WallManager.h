@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ChaosDestructionTriggerVolume.h"
 #include "Components/ActorComponent.h"
+#include "Sound/SoundCue.h"
 #include "WallManager.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -45,4 +46,19 @@ private:
 	const int32 DonationDay = 1;
 
 	void CallMorningDelegate();
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* VerticalUpCue;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* VerticalDownCue;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* HorizontalCue;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* HumanCue;
+
+	UPROPERTY(EditAnywhere)
+	USoundAttenuation* BasicAttenuation;
 };

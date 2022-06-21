@@ -1,7 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Incubator.h"
-#include "Components/WidgetComponent.h"
 #include "Components/LightComponent.h"
 #include "SmartFactoryGameInstance.h"
 
@@ -41,6 +40,8 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 	FOutputDeviceNull device;
 	FString DoorEventString = TEXT("PutCommodity");
 	GetOwner()->CallFunctionByNameWithArguments(*DoorEventString, device, NULL, true);
+
+	Progress = 0.f;
 
 	CommodityGrowthDuration = GrowingCommodityRef->GetGrowthTime();
 	StartGrowingTime = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GetGameTime();

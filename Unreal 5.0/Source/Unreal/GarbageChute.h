@@ -6,6 +6,7 @@
 #include "IDeactivator.h"
 #include "SmartFactoryGameInstance.h"
 #include "PlayerLineTrace.h"
+#include "Sound/SoundCue.h"
 #include "GarbageChute.generated.h"
 
 
@@ -41,4 +42,7 @@ private:
 	float InitialRotationRoll = 0.f;
 	float InitialRotationPitch = 0.f;
 	float InitialRotationYaw = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* MoneyCue;
 };

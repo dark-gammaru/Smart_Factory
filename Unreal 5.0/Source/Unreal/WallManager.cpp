@@ -6,6 +6,7 @@
 #include "DonationManager.h"
 #include "SmartFactoryGameInstance.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UWallManager::UWallManager()
@@ -107,6 +108,7 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 	GetWorld()->GetTimerManager().SetTimer(DownWaitHandle, FTimerDelegate::CreateLambda([=]()
 		{
 			if (downAlpha <= 0.f) { // To avoid bug, delay MakeDestroyable.
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), VerticalDownCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
 				ChaosVolume->MakeDestructable();
 				downAlpha = 0.1f;
 			}
@@ -126,6 +128,9 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 	static float upAlpha = 0.f;
 	GetWorld()->GetTimerManager().SetTimer(UpWaitHandle, FTimerDelegate::CreateLambda([=]()
 		{
+			if (upAlpha <= 0.f) {
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), VerticalUpCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+			}
 			upAlpha = FMath::Clamp(upAlpha + 0.005f, 0.f, 1.f);
 			UpHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, upAlpha));
 			if (upAlpha >= 1.f) {
@@ -134,7 +139,7 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 				UE_LOG(LogTemp, Warning, TEXT("MoveEnded"));
 				CallMorningDelegate();
 			}
-		}), CallDelay, true, 2.f);  // Wait 2 seconds
+		}), CallDelay, true, 3.f);  // Wait 3 seconds
 }
 
 /// <summary>
@@ -187,6 +192,8 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 		}
 	}
 
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HorizontalCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+
 	if (isWin) {
 		alpha = 0.01f;
 		GetWorld()->GetTimerManager().SetTimer(HorizontalWaitHandle, FTimerDelegate::CreateLambda([=]() {
@@ -204,6 +211,7 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 					}
 					TargetHolder->Destroy();
 					// TODO : CPU death Effect.
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HumanCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
 					CallMorningDelegate();
 				}
 			}
@@ -220,10 +228,13 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 			alpha = FMath::Clamp(alpha + 0.02f * alpha, 0.f, 1.f);
 			if (TargetHolder) {
 				TargetHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, alpha));
-				if (alpha >= 1.f) { // This will cause player's death.
+				ChaosVolume->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, FMath::Clamp(alpha + 0.05f, 0.f, 1.f)));
+				ChaosVolume->MakeDestructable();
+				if (alpha >= 0.7f) { // This will cause player's death.
 					GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
 					alpha = 0.f;
-					// TODO : Player death effect.
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HumanCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+					Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GameOverDelegate.Broadcast();
 				}
 			}
 			else {
