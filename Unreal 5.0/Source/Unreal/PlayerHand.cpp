@@ -2,6 +2,7 @@
 
 #include "PlayerHand.h"
 #include "Commodity.h"
+#include "Supply.h"
 #include "HoldableObject.h"
 #include "FurnatureKit.h"
 #include "GarbageChute.h"
@@ -285,6 +286,23 @@ bool UPlayerHand::IsInteractableIncubator(UIncubator* TargetIncubator) {
 					RightHandObject = HoldingObjectArray[i];
 					return true;
 				}
+			}
+		}
+	}
+	return false;
+}
+
+bool UPlayerHand::IsInteractableSupplyPort(UIncubator* TargetIncubator) {
+	if (RightHandObject && CurrentIncubator == TargetIncubator) {
+		return true;
+	}
+	for (int32 i = 0; i < HoldingObjectArray.Num(); ++i) {
+		if (HoldingObjectArray[i]) {
+			if (auto CommodityRef = HoldingObjectArray[i]->FindComponentByClass<USupply>()) {
+				CurrentIncubator = TargetIncubator;
+				SelectedIndex = i;
+				RightHandObject = HoldingObjectArray[i];
+				return true;
 			}
 		}
 	}

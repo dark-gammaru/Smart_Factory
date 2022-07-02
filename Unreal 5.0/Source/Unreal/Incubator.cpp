@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Incubator.h"
+#include "Supply.h"
 #include "Components/LightComponent.h"
 #include "SmartFactoryGameInstance.h"
 
@@ -28,6 +29,7 @@ bool UIncubator::IsInteractable(UCommodity* Item) {
 /// </summary>
 /// <param name="CommodityRef"> : Reference of Commodity</param>
 void UIncubator::PutCommodity(AActor* CommodityRef) {
+	LastTime = 0;
 	GrowingCommodityRef = CommodityRef->FindComponentByClass<UCommodity>();
 	
 	// Preventing player hold a commodity that has been already put.
@@ -48,9 +50,24 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 
 	ResultRow = Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->StaticMeshTable->FindRow<FProductRow>(*GrowingCommodityRef->GetName(), "");
 
-	if (ensure(ResultRow != nullptr)) {
+	if (!ensure(ResultRow != nullptr)) {
 		UE_LOG(LogTemp, Warning, TEXT("Table Error"));
 	}
+}
+
+void UIncubator::PutSupply(AActor* SupplyRef) {
+	SupplyRef->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
+	if (SupplyRef->FindComponentByClass<USupply>()->bIsWaterSupply) {
+		WaterLeft = FMath::Min(2.f, WaterLeft + 1.f);
+		SupplyRef->SetActorRelativeLocation(FVector(50.f, -84.f, 73.f));
+	}
+	else {
+		FoodLeft = FMath::Min(2.f, FoodLeft + 1.f);
+		SupplyRef->SetActorRelativeLocation(FVector(50.f, -28.f, 73.f));
+	}
+	SupplyRef->SetActorRelativeRotation(FRotator(-40.f, 0.f, 0.f));
+	SupplyRef->SetActorRelativeScale3D(FVector::OneVector);
+	SupplyRef->FindComponentByClass<USupply>()->DelayedDestroy();
 }
 
 /// <summary>
@@ -58,21 +75,19 @@ void UIncubator::PutCommodity(AActor* CommodityRef) {
 /// </summary>
 void UIncubator::Manufacture() {
 	GrowingCommodityRef->GetOwner()->Destroy();
-	GrowingCommodityRef = nullptr;
 	AActor* Product = Cast<AActor>(GetWorld()->SpawnActor(ResultRow->Product));
 	Product->DisableComponentsSimulatePhysics();
 	SetPosition(Product);
 	Product->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(true);
-	Product->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	ResultRow = nullptr;
+	Product->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform); 
+	ResetVariables();
 }
 
 void UIncubator::AbortCommodity() {
 	if (GrowingCommodityRef) {
 		GrowingCommodityRef->GetOwner()->Destroy();
 	}	
-	GrowingCommodityRef = nullptr;
-	ResultRow = nullptr;
+	ResetVariables();
 }
 
 
@@ -93,15 +108,15 @@ void UIncubator::SetHabitat(EHabitat Habitat) {
 /// </summary>
 /// <param name="CurrentTime"> : Current time from GameInstance.</param>
 void UIncubator::CheckTime(FDateTime CurrentTime) {
+	CalculateProgress(CurrentTime);
 	if (GrowingCommodityRef) {
-		Progress = CalculateProgress(CurrentTime);
 		if (Progress >= 1.f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->FinalModel);
 		}
 		else if (Progress >= 0.5f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->MiddleModel);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), Progress);
+		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), Progress * 100);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Empty Incubator %s : Working"), *GetOwner()->GetName());
@@ -112,10 +127,23 @@ void UIncubator::CheckTime(FDateTime CurrentTime) {
 /// Calculate growing progress as percentage. [LSH]
 /// </summary>
 /// <param name="CurrentTime"> : Current Time from GameInstance.</param>
-/// <returns>Float percentage of growing progress.</returns>
-float UIncubator::CalculateProgress(FDateTime CurrentTime) {
-	FTimespan Timespan = CurrentTime - StartGrowingTime;
-	return (float)(Timespan.GetHours() * 60 + Timespan.GetMinutes()) / CommodityGrowthDuration;
+void UIncubator::CalculateProgress(FDateTime CurrentTime) {
+	if (GrowingCommodityRef == nullptr) {
+		return;
+	}
+	if (LastTime == 0) {
+		LastTime = CurrentTime;
+	}
+	int32 TimeCount = (CurrentTime - LastTime).GetTotalMinutes() / 20;
+	while (TimeCount > 0) {
+		if (WaterLeft > 0.f && FoodLeft > 0.f) {
+			Progress += 20.f / CommodityGrowthDuration;
+		}
+		WaterLeft = FMath::Max(0.f, WaterLeft - 0.01f);
+		FoodLeft = FMath::Max(0.f, FoodLeft - 0.005f);
+		TimeCount--;
+	}
+	LastTime = CurrentTime;
 }
 
 
@@ -126,7 +154,7 @@ float UIncubator::CalculateProgress(FDateTime CurrentTime) {
 void UIncubator::SetPosition(AActor* TargetActor) {
 	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
 	if (bIsAnimal) {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 75.f));
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 70.f));
 	}
 	else {
 		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));
@@ -146,4 +174,10 @@ void UIncubator::MakeDestructable() {
 	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->CheckTimeDelegate.Remove(this, FName("CheckTime"));
 
 	Super::MakeDestructable();
+}
+
+void UIncubator::ResetVariables() {
+	GrowingCommodityRef = nullptr;
+	ResultRow = nullptr;
+	PassedTime = 0;
 }

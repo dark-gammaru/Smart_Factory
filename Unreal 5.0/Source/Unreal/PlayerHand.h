@@ -34,6 +34,8 @@ public:
 
 	bool IsInteractableIncubator(UIncubator*);
 
+	bool IsInteractableSupplyPort(UIncubator*);
+
 	TTuple<bool, int32> IsInteractableGarbageChute();
 
 	AActor* UseRightHand();
@@ -41,6 +43,7 @@ public:
 	void Hold(AActor*);
 
 private:
+	UPROPERTY()
 	APawn* PlayerCharacterRef;
 
 	int32 CurrentWeight;
@@ -49,10 +52,13 @@ private:
 
 	int32 HoldingObjectCount = 0;
 
+	UPROPERTY()
 	TArray<USceneComponent*> HoldPositions;
 
+	UPROPERTY()
 	TArray<AActor*> HoldingObjectArray;
 
+	UPROPERTY()
 	AActor* RightHandObject;
 
 	void HoldRightHand();
@@ -63,5 +69,6 @@ private:
 
 	void ReorderObjects();
 
+	UPROPERTY()
 	UIncubator* CurrentIncubator;
 };

@@ -84,8 +84,19 @@ void UPlayerInteraction::IsInteractable() {
 			bIsInteractable = PlayerHandRef->IsHoldable(HitHoldableObject);
 		}
 		else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
-			bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
-			bIsHit = bIsInteractable;
+			if (Hit.GetComponent()->ComponentHasTag("Incubator")) {
+				bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
+				bIsHit = bIsInteractable;
+			}
+			else if (Hit.GetComponent()->ComponentHasTag("SupplyPort")) {
+				bIsInteractable = PlayerHandRef->IsInteractableSupplyPort(HitIncubator);
+				bIsHit = bIsInteractable;
+			}
+			else {
+				bIsInteractable = false;
+				PlayerHandRef->ResetSwapValues();
+				Deactivate();
+			}
 		}
 		else if (auto HitGarbageChute = HitActor->FindComponentByClass<UGarbageChute>()) {
 			bIsHit = true;
@@ -147,8 +158,15 @@ void UPlayerInteraction::Interact() {
 			}
 			// If you have appropreate commodity, start growing commodity immediately.
 			else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
-				if (PlayerHandRef->IsInteractableIncubator(HitIncubator)) {
-					HitIncubator->PutCommodity(PlayerHandRef->UseRightHand());
+				if (Hit.GetComponent()->ComponentHasTag("Incubator")) {
+					if (PlayerHandRef->IsInteractableIncubator(HitIncubator)) {
+						HitIncubator->PutCommodity(PlayerHandRef->UseRightHand());
+					}
+				}
+				else if (Hit.GetComponent()->ComponentHasTag("SupplyPort")) {
+					if (PlayerHandRef->IsInteractableSupplyPort(HitIncubator)) {
+						HitIncubator->PutSupply(PlayerHandRef->UseRightHand());
+					}
 				}
 			}
 			// If hit target is garbage chute, sell holding object.
