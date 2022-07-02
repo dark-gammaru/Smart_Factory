@@ -22,6 +22,8 @@ protected:
 
 public:	
 	void PutCommodity(AActor*);
+
+	void PutSupply(AActor*);
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsAnimal();
@@ -47,6 +49,12 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float Progress = 0.f;
 
+	UPROPERTY(BlueprintReadOnly)
+	float WaterLeft = 1.f;
+
+	UPROPERTY(BlueprintReadOnly)
+	float FoodLeft = 1.f;
+
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -62,10 +70,18 @@ private:
 
 	FProductRow* ResultRow;
 
+	UPROPERTY()
 	FDateTime StartGrowingTime;
 
-	float CalculateProgress(FDateTime CurrentTime);
+	void CalculateProgress(FDateTime CurrentTime);
 
 	void SetPosition(AActor*);
 
+	UPROPERTY()
+	FTimespan PassedTime = 0;
+
+	UPROPERTY()
+	FDateTime LastTime = 0;
+
+	void ResetVariables();
 };

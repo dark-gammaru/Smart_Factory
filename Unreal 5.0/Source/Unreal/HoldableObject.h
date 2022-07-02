@@ -31,6 +31,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FString Name;
 
+	UPROPERTY()
 	int32 Price;
 
 	UPROPERTY(EditAnywhere)

@@ -7,13 +7,12 @@ UPlayerLineTrace::UPlayerLineTrace()
 	PrimaryComponentTick.bCanEverTick = true;
 	LineTraceObject = new LineTraceObjectStrategy(GetOwner(), GetWorld());
 	LineTraceFloor = new LineTraceFloorStrategy(GetOwner(), GetWorld());
+	ActiveLineTrace = LineTraceObject;
 }
 
 void UPlayerLineTrace::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ActiveLineTrace = LineTraceObject;
 }
 
 void UPlayerLineTrace::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
