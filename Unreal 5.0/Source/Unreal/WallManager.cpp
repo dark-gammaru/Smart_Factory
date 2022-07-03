@@ -14,6 +14,8 @@ UWallManager::UWallManager()
 }
 
 void UWallManager::CheckDonation() {
+	DonationWin();
+	return;
 	if (DayCount == DonationDay) {
 		float rnd = FMath::FRand();
 		if (rnd <= GetOwner()->FindComponentByClass<UDonationManager>()->GetDistribution()) {
@@ -196,28 +198,41 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 	if (isWin) {
 		alpha = 0.01f;
 		GetWorld()->GetTimerManager().SetTimer(HorizontalWaitHandle, FTimerDelegate::CreateLambda([=]() {
-			alpha = FMath::Clamp(alpha + 0.02f * alpha, 0.f, 1.f);
-			if (TargetHolder) {
-				TargetHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, alpha));
-				if (alpha >= 1.f) { // This will cause CPU's death.
-					GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
-					alpha = 0.f;
-					// After winning, destroy walls for next phase
-					TArray<AActor*> ChildWallArray;
-					TargetHolder->GetAttachedActors(ChildWallArray, true);
-					for (auto Wall : ChildWallArray) {
-						Wall->Destroy();
+			if (alpha <= 1.0f) {
+				alpha = FMath::Clamp(alpha + 0.02f * alpha, 0.f, 1.f);
+				if (TargetHolder) {
+					TargetHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, alpha));
+					if (alpha == 1.f) { // This will cause CPU's death.
+						// TODO : CPU death Effect.
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), HumanCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+						CallMorningDelegate();
+						alpha = 1.5f;
 					}
-					TargetHolder->Destroy();
-					// TODO : CPU death Effect.
-					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HumanCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+				}
+				else {
+					GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
+					UE_LOG(LogTemp, Error, TEXT("Horizontal Wall error : No holder"));
 					CallMorningDelegate();
 				}
 			}
 			else {
-				GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
-				UE_LOG(LogTemp, Error, TEXT("Horizontal Wall error : No holder"));
-				CallMorningDelegate();
+				alpha = alpha + 0.01f;
+				if (alpha >= 4.f && alpha < 5.f && TargetHolder) {
+					TargetHolder->SetActorLocation(FMath::Lerp(MovedLocation, MovedLocation + FVector(0, 0, 300.f), alpha - 4.f));
+				}
+				else if (alpha > 5.f) {
+					if (TargetHolder) {
+						GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
+						alpha = 0.f;
+						// After winning, destroy walls for next phase
+						TArray<AActor*> ChildWallArray;
+						TargetHolder->GetAttachedActors(ChildWallArray, true);
+						for (auto Wall : ChildWallArray) {
+							Wall->Destroy();
+						}
+						TargetHolder->Destroy();
+					}
+				}
 			}
 			}), 0.02f, true);
 	}

@@ -39,7 +39,7 @@ private:
 	const float FloorHeight = 200.f;
 	const float CeilingHeight = 550.f;
 
-	TArray<float> HorizontalWinLocation{ 1355.0f, 1655.0f, 2900.0f };
+	TArray<float> HorizontalWinLocation{ 1245.0f, 1535.0f, 2740.0f };
 	TArray<float> HorizontalLoseLocation{ 60.f, 100.f, 180.f };
 
 	int32 DayCount = 0;

@@ -154,7 +154,7 @@ void UIncubator::CalculateProgress(FDateTime CurrentTime) {
 void UIncubator::SetPosition(AActor* TargetActor) {
 	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
 	if (bIsAnimal) {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 70.f));
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 45.f, 75.f));
 	}
 	else {
 		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));
