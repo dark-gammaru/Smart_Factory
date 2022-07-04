@@ -16,6 +16,9 @@ UWallManager::UWallManager()
 void UWallManager::CheckDonation() {
 	DonationWin();
 	return;
+	if (CurrentPhase == 3) {
+		return;
+	}
 	if (DayCount == DonationDay) {
 		float rnd = FMath::FRand();
 		if (rnd <= GetOwner()->FindComponentByClass<UDonationManager>()->GetDistribution()) {
@@ -38,9 +41,9 @@ void UWallManager::DonationWin() {
 	if (CurrentLife == 4) {
 		//Kill and Next Phase
 		MoveWallHorizontal(CurrentPhase, CurrentLife);
-		++CurrentPhase;
 		GetOwner()->FindComponentByClass<UDonationManager>()->CurrentPhase++;
 		ChaosVolume->ChangeSize(CurrentPhase);
+		++CurrentPhase;
 		CurrentLife = 2;
 	}
 	else {
@@ -217,6 +220,10 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 			}
 			else {
 				alpha = alpha + 0.01f;
+				if (alpha >= 3.9f && alpha < 4.f) {
+					UGameplayStatics::PlaySoundAtLocation(GetWorld(), VerticalUpCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+					alpha = 4.f;
+				}
 				if (alpha >= 4.f && alpha < 5.f && TargetHolder) {
 					TargetHolder->SetActorLocation(FMath::Lerp(MovedLocation, MovedLocation + FVector(0, 0, 300.f), alpha - 4.f));
 				}
