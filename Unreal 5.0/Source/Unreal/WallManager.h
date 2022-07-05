@@ -23,7 +23,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CheckDonation();
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AChaosDestructionTriggerVolume* ChaosVolume = nullptr;
 
 private:

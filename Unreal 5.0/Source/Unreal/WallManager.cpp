@@ -14,7 +14,8 @@ UWallManager::UWallManager()
 }
 
 void UWallManager::CheckDonation() {
-	DonationWin();
+	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GameClearDelegate.Broadcast();
+
 	return;
 	if (CurrentPhase == 3) {
 		return;
@@ -229,8 +230,8 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 				}
 				else if (alpha > 5.f) {
 					if (TargetHolder) {
-						GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
 						alpha = 0.f;
+						GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
 						// After winning, destroy walls for next phase
 						TArray<AActor*> ChildWallArray;
 						TargetHolder->GetAttachedActors(ChildWallArray, true);
@@ -238,6 +239,10 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 							Wall->Destroy();
 						}
 						TargetHolder->Destroy();
+
+						if (CurrentPhase == 3) {
+							Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GameClearDelegate.Broadcast();
+						}
 					}
 				}
 			}

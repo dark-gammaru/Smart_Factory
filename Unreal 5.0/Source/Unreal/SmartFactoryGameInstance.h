@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrencySpendDelegate, int32, Curre
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNightDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMorningDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameClearDelegate);
 
 UCLASS()
 class UNREAL_API USmartFactoryGameInstance : public UGameInstance
@@ -62,4 +63,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
 	FGameOverDelegate GameOverDelegate;
+
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Event")
+	FGameClearDelegate GameClearDelegate;
 };

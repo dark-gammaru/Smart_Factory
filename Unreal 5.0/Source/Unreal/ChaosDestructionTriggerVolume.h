@@ -7,7 +7,7 @@
 #include "ChaosDestructable.h"
 #include "ChaosDestructionTriggerVolume.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UNREAL_API AChaosDestructionTriggerVolume : public ATriggerVolume
 {
 	GENERATED_BODY()
@@ -15,6 +15,7 @@ class UNREAL_API AChaosDestructionTriggerVolume : public ATriggerVolume
 public:
 	AChaosDestructionTriggerVolume();
 
+	UFUNCTION(BlueprintCallable)
 	void MakeDestructable();
 
 	void ChangeSize(int32 Phase);
@@ -26,6 +27,7 @@ private:
 	UFUNCTION()
 	void OnOverlapEnd(class AActor* OverlappedActor, class AActor* OtherActor);
 
+	UPROPERTY()
 	TArray<UChaosDestructable*> DestructionTargets;
 	TArray<FVector> PhaseSize{ FVector(1.f, 50.f, 4.f), FVector(50.f, 1.f, 4.f) , FVector(2.f, 50.f, 4.f) };
 };
