@@ -3,6 +3,7 @@
 #include "Incubator.h"
 #include "Supply.h"
 #include "Components/LightComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "SmartFactoryGameInstance.h"
 
 // Called when the game starts
@@ -68,6 +69,7 @@ void UIncubator::PutSupply(AActor* SupplyRef) {
 	SupplyRef->SetActorRelativeRotation(FRotator(-40.f, 0.f, 0.f));
 	SupplyRef->SetActorRelativeScale3D(FVector::OneVector);
 	SupplyRef->FindComponentByClass<USupply>()->DelayedDestroy();
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), SupplyCue, SupplyRef->GetActorLocation(), FRotator::ZeroRotator);
 }
 
 /// <summary>

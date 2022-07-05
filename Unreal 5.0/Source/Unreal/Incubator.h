@@ -9,6 +9,7 @@
 #include "HoldableObject.h"
 #include "HoldableObjectEnum.h"
 #include "Misc/OutputDeviceNull.h"
+#include "Sound/SoundCue.h"
 #include "ChaosDestructable.h"
 #include "Incubator.generated.h"
 
@@ -84,4 +85,7 @@ private:
 	FDateTime LastTime = 0;
 
 	void ResetVariables();
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* SupplyCue;
 };

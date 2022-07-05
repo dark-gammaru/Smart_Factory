@@ -84,13 +84,20 @@ void UPlayerInteraction::IsInteractable() {
 			bIsInteractable = PlayerHandRef->IsHoldable(HitHoldableObject);
 		}
 		else if (auto HitIncubator = HitActor->FindComponentByClass<UIncubator>()) {
-			if (Hit.GetComponent()->ComponentHasTag("Incubator")) {
-				bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
-				bIsHit = bIsInteractable;
-			}
-			else if (Hit.GetComponent()->ComponentHasTag("SupplyPort")) {
-				bIsInteractable = PlayerHandRef->IsInteractableSupplyPort(HitIncubator);
-				bIsHit = bIsInteractable;
+			if (Hit.GetComponent()) {
+				if (Hit.GetComponent()->ComponentHasTag("Incubator")) {
+					bIsInteractable = PlayerHandRef->IsInteractableIncubator(HitIncubator);
+					bIsHit = bIsInteractable;
+				}
+				else if (Hit.GetComponent()->ComponentHasTag("SupplyPort")) {
+					bIsInteractable = PlayerHandRef->IsInteractableSupplyPort(HitIncubator);
+					bIsHit = bIsInteractable;
+				}
+				else {
+					bIsInteractable = false;
+					PlayerHandRef->ResetSwapValues();
+					Deactivate();
+				}
 			}
 			else {
 				bIsInteractable = false;
