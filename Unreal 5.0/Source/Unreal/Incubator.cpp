@@ -112,7 +112,7 @@ void UIncubator::SetHabitat(EHabitat Habitat) {
 void UIncubator::CheckTime(FDateTime CurrentTime) {
 	CalculateProgress(CurrentTime);
 	if (GrowingCommodityRef) {
-		if (Progress >= 1.f) {
+		if (Progress >= 0.99f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->FinalModel);
 		}
 		else if (Progress >= 0.5f) {
@@ -152,7 +152,7 @@ void UIncubator::CalculateProgress(FDateTime CurrentTime) {
 void UIncubator::SetPosition(AActor* TargetActor) {
 	TargetActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepRelativeTransform);
 	if (bIsAnimal) {
-		TargetActor->SetActorRelativeLocation(FVector(0.f, 45.f, 75.f));
+		TargetActor->SetActorRelativeLocation(FVector(0.f, 45.f, 55.f));
 	}
 	else {
 		TargetActor->SetActorRelativeLocation(FVector(0.f, 55.f, 86.f));

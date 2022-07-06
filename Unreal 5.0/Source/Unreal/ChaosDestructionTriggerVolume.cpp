@@ -41,6 +41,7 @@ void AChaosDestructionTriggerVolume::OnOverlapEnd(class AActor* OverlappedActor,
 
 void AChaosDestructionTriggerVolume::ChangeSize(int32 Phase) {
 	SetActorScale3D(PhaseSize[Phase]);
+	SetActorLocation(FVector(0, 0, -2000.f));
 }
 
 void AChaosDestructionTriggerVolume::MakeDestructable() {

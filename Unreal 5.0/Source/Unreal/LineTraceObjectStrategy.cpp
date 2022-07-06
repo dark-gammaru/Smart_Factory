@@ -28,7 +28,7 @@ FHitResult LineTraceObjectStrategy::GetReach() const {
 	FHitResult SecondHit;
 	if (auto Comp = Hit.GetComponent()) {
 		if (Comp->ComponentHasTag("Incubator")) {
-			FVector SecondStart = FMath::Lerp(Hit.Location, PlayerReach, 0.5f);
+			FVector SecondStart = FMath::Lerp(Hit.Location, PlayerReach, 0.1f);
 			WorldRef->LineTraceSingleByChannel(
 				OUT SecondHit,
 				SecondStart,

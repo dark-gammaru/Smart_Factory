@@ -40,8 +40,8 @@ void UWallManager::DonationWin() {
 		//Kill and Next Phase
 		MoveWallHorizontal(CurrentPhase, CurrentLife);
 		GetOwner()->FindComponentByClass<UDonationManager>()->CurrentPhase++;
-		ChaosVolume->ChangeSize(CurrentPhase);
 		++CurrentPhase;
+		ChaosVolume->ChangeSize(CurrentPhase);
 		CurrentLife = 2;
 	}
 	else {
