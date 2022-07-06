@@ -34,7 +34,7 @@ private:
 	const float Mean = 0.5f;
 	const float Variance = 0.10f;
 
-	TArray<float> MaxDonation{1000.f, 3000.f, 10000.f};
+	TArray<float> MaxDonation{1000.f, 5000.f, 10000.f};
 
 	float SavedDistribution;
 

@@ -118,10 +118,6 @@ void UIncubator::CheckTime(FDateTime CurrentTime) {
 		else if (Progress >= 0.5f) {
 			GrowingCommodityRef->GetOwner()->FindComponentByClass<UStaticMeshComponent>()->SetStaticMesh(ResultRow->MiddleModel);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("%s Growing... %5.1f%%"), *GetOwner()->GetName(), Progress * 100);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("Empty Incubator %s : Working"), *GetOwner()->GetName());
 	}
 }
 

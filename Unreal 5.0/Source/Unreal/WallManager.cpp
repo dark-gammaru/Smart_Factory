@@ -14,9 +14,6 @@ UWallManager::UWallManager()
 }
 
 void UWallManager::CheckDonation() {
-	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->GameClearDelegate.Broadcast();
-
-	return;
 	if (CurrentPhase == 3) {
 		return;
 	}
