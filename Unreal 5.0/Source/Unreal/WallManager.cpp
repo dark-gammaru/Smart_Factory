@@ -6,11 +6,31 @@
 #include "DonationManager.h"
 #include "SmartFactoryGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "PlayerCharacter.h"
 
 // Sets default values for this component's properties
 UWallManager::UWallManager()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void UWallManager::BeginPlay() 
+{
+	Super::BeginPlay();
+
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	auto CameraShakeSourceComponents = PlayerCharacter->GetComponentsByClass(UCameraShakeSourceComponent::StaticClass());
+	for (auto CameraShakeSourceComponent : CameraShakeSourceComponents)
+	{
+		if (CameraShakeSourceComponent->ComponentHasTag(FName("Drag")))
+		{
+			CameraShakeSourceDrag = Cast<UCameraShakeSourceComponent>(CameraShakeSourceComponent);
+		}
+		if (CameraShakeSourceComponent->ComponentHasTag(FName("Shut")))
+		{
+			CameraShakeSourceShut = Cast<UCameraShakeSourceComponent>(CameraShakeSourceComponent);
+		}
+	}
 }
 
 void UWallManager::CheckDonation() {
@@ -108,21 +128,22 @@ void UWallManager::MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex) 
 	float CallDelay = 0.01f;  // Call lambda function every 0.01 second.
 	static float downAlpha = 0.f;
 	GetWorld()->GetTimerManager().SetTimer(DownWaitHandle, FTimerDelegate::CreateLambda([=]()
-		{
-			if (downAlpha <= 0.f) { // To avoid bug, delay MakeDestroyable.
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), VerticalDownCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
-				ChaosVolume->MakeDestructable();
-				downAlpha = 0.1f;
-			}
-			else if (downAlpha >= 1.f) { // Exit lambda.
-				GetWorld()->GetTimerManager().ClearTimer(DownWaitHandle);
-				downAlpha = 0.f;
-			}
-			else {
-				downAlpha = FMath::Clamp(downAlpha + 0.05f * downAlpha + 0.05f, 0.f, 1.f); // Change location very fast.
-				DownHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, downAlpha));
-			}
-		}), CallDelay, true, 1.f);
+	{
+		if (downAlpha <= 0.f) { // To avoid bug, delay MakeDestroyable.
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), VerticalDownCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
+			ChaosVolume->MakeDestructable();
+			downAlpha = 0.1f;
+		}
+		else if (downAlpha >= 1.f) { // Exit lambda.
+			GetWorld()->GetTimerManager().ClearTimer(DownWaitHandle);
+			ShakeCamera(CameraShakeSourceShut, 1.5f);
+			downAlpha = 0.f;
+		}
+		else {
+			downAlpha = FMath::Clamp(downAlpha + 0.05f * downAlpha + 0.05f, 0.f, 1.f); // Change location very fast.
+			DownHolder->SetActorLocation(FMath::Lerp(OriginalLocation, MovedLocation, downAlpha));
+		}
+	}), CallDelay, true, 1.f);
 
 	// Move wall up
 	OriginalLocation = UpHolder->GetActorLocation();
@@ -165,7 +186,6 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 			break;
 		}
 	}
-
 	// Move wall smoothly with lambda function.
 	FVector OriginalLocation;
 	FVector MovedLocation;
@@ -195,7 +215,7 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 	}
 
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), HorizontalCue, OriginalLocation, FRotator::ZeroRotator, 1.f, 1.f, 0.f, BasicAttenuation);
-
+	ShakeCamera(CameraShakeSourceDrag, 4.6f);
 	if (isWin) {
 		alpha = 0.01f;
 		GetWorld()->GetTimerManager().SetTimer(HorizontalWaitHandle, FTimerDelegate::CreateLambda([=]() {
@@ -229,6 +249,7 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 					if (TargetHolder) {
 						alpha = 0.f;
 						GetWorld()->GetTimerManager().ClearTimer(HorizontalWaitHandle);
+						CameraShakeSourceDrag->StopAllCameraShakes();
 						// After winning, destroy walls for next phase
 						TArray<AActor*> ChildWallArray;
 						TargetHolder->GetAttachedActors(ChildWallArray, true);
@@ -271,4 +292,21 @@ void UWallManager::MoveWallHorizontal(int32 Phase, int32 Life) {
 
 void UWallManager::CallMorningDelegate() {
 	Cast<USmartFactoryGameInstance>(GetWorld()->GetGameInstance())->MorningDelegate.Broadcast();
+}
+
+
+void UWallManager::ShakeCamera(UCameraShakeSourceComponent* CameraShakeSource, float Duration)
+{
+	if (IsValid(CameraShakeSource))
+	{
+		CameraShakeSource->StartCameraShake(CameraShakeSource->CameraShake);
+	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([=]() {
+		if (IsValid(CameraShakeSource))
+		{
+			CameraShakeSource->StopAllCameraShakes();
+		}
+	}), Duration, false);
 }

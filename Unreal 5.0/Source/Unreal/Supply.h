@@ -16,4 +16,7 @@ public:
 	bool bIsWaterSupply = false;
 
 	void DelayedDestroy();
+
+	UPROPERTY()
+	FTimerHandle TimerHandle;
 };

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraShakeSourceComponent.h"
 #include "ChaosDestructionTriggerVolume.h"
 #include "Components/ActorComponent.h"
 #include "Sound/SoundCue.h"
@@ -26,12 +26,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AChaosDestructionTriggerVolume* ChaosVolume = nullptr;
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	void DonationWin();
 	void DonationLose();
 
 	void MoveWallVertical(int32 DownTargetIndex, int32 UpTargetIndex);
 	void MoveWallHorizontal(int32 Phase, int32 Life);
+
+	void ShakeCamera(UCameraShakeSourceComponent* CameraShakeSource, float Duration);
 
 	int32 CurrentPhase = 0;
 	int32 CurrentLife = 2;
@@ -61,4 +66,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundAttenuation* BasicAttenuation;
+
+	UCameraShakeSourceComponent* CameraShakeSourceDrag;
+	UCameraShakeSourceComponent* CameraShakeSourceShut;
 };

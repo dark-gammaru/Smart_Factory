@@ -4,10 +4,8 @@
 #include "Supply.h"
 
 void USupply::DelayedDestroy() {
-	static FTimerHandle TimerHandle;
 	auto Owner = GetOwner();
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([Owner]()
-		{
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([Owner]() {
 			Owner->Destroy();
-		}), 1.f, false, 2.f);
+	}), 1.f, false, 2.f);
 }
